@@ -1,0 +1,417 @@
+{
+  "domain": "visa_bulletin",
+  "generated_at": "2026-07-06",
+  "generated_by": "claude-fable-5-web-research",
+  "bulletin_month": "2026-07",
+  "source_url": "https://travel.state.gov/content/travel/en/legal/visa-law0/visa-bulletin/2026/visa-bulletin-for-july-2026.html",
+  "bulletin_number": "Number 16, Volume XI",
+  "uscis_chart_for_employment_i485": "final_action_dates",
+  "uscis_designation_source_url": "https://www.uscis.gov/visabulletininfo",
+  "uscis_designation_detail_url": "https://www.uscis.gov/green-card/green-card-processes-and-procedures/visa-availability-priority-dates/when-to-file-your-adjustment-of-status-application-for-family-sponsored-or-employment-based-126",
+  "confirmed_by_counsel": false,
+  "last_verified": "2026-07-06",
+  "categories": [
+    {
+      "preference": "EB-1",
+      "country": "all_chargeability",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-1",
+      "country": "china_mainland",
+      "final_action_date": "2023-06-01",
+      "date_for_filing": "2023-12-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-1",
+      "country": "india",
+      "final_action_date": "2022-10-15",
+      "date_for_filing": "2023-12-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-1",
+      "country": "mexico",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-1",
+      "country": "philippines",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-2",
+      "country": "all_chargeability",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-2",
+      "country": "china_mainland",
+      "final_action_date": "2021-09-01",
+      "date_for_filing": "2022-01-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-2",
+      "country": "india",
+      "final_action_date": "UNAVAILABLE",
+      "date_for_filing": "2015-01-15",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-2",
+      "country": "mexico",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-2",
+      "country": "philippines",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-3",
+      "country": "all_chargeability",
+      "final_action_date": "2024-08-01",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-3",
+      "country": "china_mainland",
+      "final_action_date": "2021-12-22",
+      "date_for_filing": "2022-01-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-3",
+      "country": "india",
+      "final_action_date": "2014-01-01",
+      "date_for_filing": "2015-01-15",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-3",
+      "country": "mexico",
+      "final_action_date": "2024-08-01",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-3",
+      "country": "philippines",
+      "final_action_date": "2023-08-01",
+      "date_for_filing": "2024-01-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-3 Other Workers",
+      "country": "all_chargeability",
+      "final_action_date": "2022-03-01",
+      "date_for_filing": "2022-08-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-3 Other Workers",
+      "country": "china_mainland",
+      "final_action_date": "2019-04-01",
+      "date_for_filing": "2019-10-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-3 Other Workers",
+      "country": "india",
+      "final_action_date": "2014-01-01",
+      "date_for_filing": "2015-01-15",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-3 Other Workers",
+      "country": "mexico",
+      "final_action_date": "2022-03-01",
+      "date_for_filing": "2022-08-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-3 Other Workers",
+      "country": "philippines",
+      "final_action_date": "2021-12-01",
+      "date_for_filing": "2022-08-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-4",
+      "country": "all_chargeability",
+      "final_action_date": "2022-09-15",
+      "date_for_filing": "2023-01-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-4",
+      "country": "china_mainland",
+      "final_action_date": "2022-09-15",
+      "date_for_filing": "2023-01-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-4",
+      "country": "india",
+      "final_action_date": "2022-09-15",
+      "date_for_filing": "2023-01-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-4",
+      "country": "mexico",
+      "final_action_date": "2022-09-15",
+      "date_for_filing": "2023-01-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-4",
+      "country": "philippines",
+      "final_action_date": "2022-09-15",
+      "date_for_filing": "2023-01-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-4 Certain Religious Workers",
+      "country": "all_chargeability",
+      "final_action_date": "2022-09-15",
+      "date_for_filing": "2023-01-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-4 Certain Religious Workers",
+      "country": "china_mainland",
+      "final_action_date": "2022-09-15",
+      "date_for_filing": "2023-01-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-4 Certain Religious Workers",
+      "country": "india",
+      "final_action_date": "2022-09-15",
+      "date_for_filing": "2023-01-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-4 Certain Religious Workers",
+      "country": "mexico",
+      "final_action_date": "2022-09-15",
+      "date_for_filing": "2023-01-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-4 Certain Religious Workers",
+      "country": "philippines",
+      "final_action_date": "2022-09-15",
+      "date_for_filing": "2023-01-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 Unreserved",
+      "country": "all_chargeability",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 Unreserved",
+      "country": "china_mainland",
+      "final_action_date": "2016-12-01",
+      "date_for_filing": "2017-03-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 Unreserved",
+      "country": "india",
+      "final_action_date": "UNAVAILABLE",
+      "date_for_filing": "2024-05-01",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 Unreserved",
+      "country": "mexico",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 Unreserved",
+      "country": "philippines",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 Rural Set-Aside",
+      "country": "all_chargeability",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 Rural Set-Aside",
+      "country": "china_mainland",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 Rural Set-Aside",
+      "country": "india",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 Rural Set-Aside",
+      "country": "mexico",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 Rural Set-Aside",
+      "country": "philippines",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 High Unemployment Set-Aside",
+      "country": "all_chargeability",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 High Unemployment Set-Aside",
+      "country": "china_mainland",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 High Unemployment Set-Aside",
+      "country": "india",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 High Unemployment Set-Aside",
+      "country": "mexico",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 High Unemployment Set-Aside",
+      "country": "philippines",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 Infrastructure Set-Aside",
+      "country": "all_chargeability",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 Infrastructure Set-Aside",
+      "country": "china_mainland",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 Infrastructure Set-Aside",
+      "country": "india",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 Infrastructure Set-Aside",
+      "country": "mexico",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    },
+    {
+      "preference": "EB-5 Infrastructure Set-Aside",
+      "country": "philippines",
+      "final_action_date": "CURRENT",
+      "date_for_filing": "CURRENT",
+      "confirmed_by_counsel": false,
+      "last_verified": "2026-07-06"
+    }
+  ],
+  "notes": "Countries: all_chargeability, china_mainland, india, mexico, philippines. This is a monthly snapshot; the platform must refresh it monthly. Source is DOS Visa Bulletin for July 2026 (Number 16, Volume XI), employment-based tables A (Final Action Dates) and B (Dates for Filing), verified by two independent verbatim reads of travel.state.gov on 2026-07-06. USCIS designated the FINAL ACTION DATES chart for ALL employment-based preference I-485 filings in July 2026 (third consecutive month); direct fetch of uscis.gov/visabulletininfo returned HTTP 403 to automated clients on 2026-07-06, so the designation was corroborated via Morgan Lewis (morganlewis.com/pubs/2026/06/us-department-of-state-releases-july-2026-visa-bulletin), Tafapolsky & Smith LLP, and AILA (aila.org/library/uscis-adjustment-of-status-filing-dates-for-july-2026) reports of the USCIS announcement; Morgan Lewis's reported cutoffs match the DOS tables exactly. Notable July 2026 conditions: EB-2 India final action is UNAVAILABLE (U - annual limit reached; no visas may be issued and no FAD-chart I-485 filings for EB-2 India this month); EB-5 Unreserved India final action is also UNAVAILABLE; EB-1 India retrogressed slightly to 2022-10-15; all EB-5 set-aside categories (Rural 20%, High Unemployment 10%, Infrastructure 2%) are CURRENT for all countries. Because USCIS is honoring the Final Action Dates chart, the Dates for Filing values are recorded for reference/consular context but do NOT govern July 2026 employment-based I-485 eligibility. CURRENT means all priority dates are authorized; UNAVAILABLE means no visa numbers are authorized for the month. Status keys most affected: i140_approved -> i485_pending transitions (i140_approved__i485_pending) are gated by the final_action_date rows above for July 2026; consular_pending final action is likewise gated by table A.",
+  "unconfirmed_notes": "UNVERIFIED: uscis_chart_for_employment_i485 (final_action_dates) could not be confirmed directly from the official source; uscis.gov/visabulletininfo and the July 2026 When to File page (.../employment-based-126) returned HTTP 403 to automated clients again on adversarial re-check 2026-07-06. Designation is corroborated by four independent secondary sources: Morgan Lewis (morganlewis.com/pubs/2026/06/us-department-of-state-releases-july-2026-visa-bulletin: 'USCIS will follow the Final Action Dates chart for employment-based adjustment of status applications in July 2026'), Tafapolsky & Smith LLP ('third successive month' of Final Action Dates for EB), Ogletree Deakins, and immi-usa.com (quoting the USCIS When to File language: 'Employment-based categories: You must use the Final Action Dates chart in the Department of State Visa Bulletin for July 2026'). All DOS table values were independently re-verified against travel.state.gov on 2026-07-06 and matched exactly; a Gozel Law article listing EB-4 as 15JUL22 reflects the June 2026 value (EB-4 advanced 15JUL22 -> 15SEP22 in July 2026). Recommend human re-verification of the USCIS designation against uscis.gov/visabulletininfo in a browser."
+}

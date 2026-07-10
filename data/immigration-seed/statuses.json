@@ -1,0 +1,307 @@
+{
+  "domain": "statuses",
+  "generated_at": "2026-07-06",
+  "statuses": [
+    {
+      "key": "us_citizen",
+      "label": "US Citizen",
+      "track": "none",
+      "sponsorship_required": false,
+      "work_authorized": true,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [
+        "us_passport",
+        "list_b_plus_list_c_documents"
+      ],
+      "is_overlay": false,
+      "placeholder": false,
+      "grace_period_days": null,
+      "notes": "No sponsorship needed (spec 7.1). Unrestricted work authorization; I-9 completion still required (List A, or List B + List C, all unexpired; employer may not demand specific documents). No immigration case tracking beyond I-9/E-Verify obligations."
+    },
+    {
+      "key": "permanent_resident",
+      "label": "Lawful Permanent Resident (Green Card Holder)",
+      "track": "none",
+      "sponsorship_required": false,
+      "work_authorized": true,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [
+        "permanent_resident_card_i551"
+      ],
+      "is_overlay": false,
+      "placeholder": false,
+      "grace_period_days": null,
+      "notes": "No sponsorship needed (spec 7.1). Also the terminal state of the green-card overlay track (i485_pending -> permanent_resident, or consular_pending -> permanent_resident). Unrestricted work authorization; track card expiry for I-9 reverification exemption awareness only."
+    },
+    {
+      "key": "f1_studying",
+      "label": "F-1 Student (Enrolled, No Work Authorization for Firm)",
+      "track": "f1",
+      "sponsorship_required": true,
+      "work_authorized": false,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [],
+      "is_overlay": false,
+      "placeholder": false,
+      "grace_period_days": 60,
+      "notes": "Enrolled F-1 student; not work-authorized for off-campus employment with the firm without CPT/OPT authorization. Precondition state for f1_cpt (requires one full academic year enrolled, narrow exceptions, per A.1). Standard F-1 60-day grace period after program completion if no OPT is pursued."
+    },
+    {
+      "key": "f1_cpt",
+      "label": "F-1 Curricular Practical Training (CPT)",
+      "track": "f1",
+      "sponsorship_required": true,
+      "work_authorized": true,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [
+        "i20_with_cpt_authorization"
+      ],
+      "is_overlay": false,
+      "placeholder": false,
+      "grace_period_days": null,
+      "notes": "DSO authorizes on I-20; no USCIS filing and no EAD (A.1). Employment must be integral to curriculum. Critical constraint: 12 or more months of cumulative full-time CPT eliminates OPT eligibility at that degree level - track cumulative full-time CPT days. Work authorization is employer/dates-specific per the I-20 endorsement."
+    },
+    {
+      "key": "f1_opt",
+      "label": "F-1 Post-Completion OPT",
+      "track": "f1",
+      "sponsorship_required": true,
+      "work_authorized": true,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [
+        "ead_card"
+      ],
+      "is_overlay": false,
+      "placeholder": false,
+      "grace_period_days": 60,
+      "notes": "12 months per degree level, less any pre-completion OPT used (A.2). Work may start only on EAD start date with card in hand. Unemployment limit: 90 aggregate calendar days from EAD start (8 CFR 214.2(f)(10)(ii)(E)); days abroad count (narrow exceptions); exceeding risks SEVIS termination. Employment must be directly related to degree, at least 20 hrs/week, US employer. 60-day grace after EAD expiry (status only, no work authorization)."
+    },
+    {
+      "key": "f1_stem_opt",
+      "label": "F-1 STEM OPT Extension",
+      "track": "f1",
+      "sponsorship_required": true,
+      "work_authorized": true,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [
+        "ead_card",
+        "expired_opt_ead_plus_i797c_receipt_during_180_day_auto_extension"
+      ],
+      "is_overlay": false,
+      "placeholder": false,
+      "grace_period_days": 60,
+      "notes": "24 months, once per qualifying STEM CIP degree level; requires E-Verify employer and Form I-983 training plan (A.3). Timely filing auto-extends work authorization up to 180 days past OPT EAD expiry while pending. Unemployment limit: 150 aggregate days inclusive of the 90 already used on OPT (does not reset). Reporting: validation reports at 6/12/18/24 months; material changes within 10 days; employer reports departure within 5 days; missed reports risk SEVIS failure-to-report termination. 60-day grace after STEM EAD expiry (status only)."
+    },
+    {
+      "key": "h1b_active",
+      "label": "H-1B (Active)",
+      "track": "h1b",
+      "sponsorship_required": true,
+      "work_authorized": true,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [
+        "i797_approval_notice",
+        "i94"
+      ],
+      "is_overlay": false,
+      "placeholder": false,
+      "grace_period_days": 60,
+      "notes": "Employer-sponsored specialty occupation status. Max stay 6 years (typically 3+3) absent AC21 extensions (A.6). 60-day grace period on termination of employment (7.4); offboarding must trigger the grace-period clock. Amended petition required before/at a material change (worksite outside original metro area, significant role change) - staffing placements must keep client letter, SOW, per-worksite LCA, and itinerary current (7.6). Track I-94 expiry, petition validity dates, and passport expiry."
+    },
+    {
+      "key": "h1b_cap_gap",
+      "label": "H-1B Cap-Gap (OPT/STEM to H-1B Bridge)",
+      "track": "h1b",
+      "sponsorship_required": true,
+      "work_authorized": true,
+      "work_authorized_conditional": true,
+      "work_authorization_evidence": [
+        "i797c_receipt_notice",
+        "cap_gap_i20"
+      ],
+      "is_overlay": false,
+      "placeholder": false,
+      "grace_period_days": null,
+      "notes": "Automatic on a timely cap-subject H-1B petition requesting change of status (not consular) while on OPT/STEM (A.4). Under the H-1B modernization rule effective 2025-01-17, cap-gap ends April 1 of the relevant fiscal year (previously October 1). Conditional work authorization: filing from ACTIVE OPT/STEM extends status AND work authorization; filing from the 60-day grace extends status ONLY (work_authorized=true here assumes the active-OPT branch; the validator must check the sub-condition). Not available for cap-exempt employers. Does NOT pause the OPT unemployment clock. I-9 proof: I-797C receipt + cap-gap I-20. work_authorized_conditional=true: consumers must evaluate rules_capgap.json capgap-work-auth-extension-condition / capgap-grace-period-filing-work-authorization before treating the boolean as a grant."
+    },
+    {
+      "key": "h1b_transfer_pending",
+      "label": "H-1B Transfer Pending (Portability)",
+      "track": "h1b",
+      "sponsorship_required": true,
+      "work_authorized": true,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [
+        "i797c_receipt_notice",
+        "prior_i797_approval_notice",
+        "i94"
+      ],
+      "is_overlay": false,
+      "placeholder": false,
+      "grace_period_days": null,
+      "notes": "AC21 section 105 portability: the beneficiary may begin work for the new employer upon receipt of the transfer petition (A.6). Track receipt number, RFE deadlines, and denial branch (RFE/denial/re-file branches required on all transitions per 7.4). On approval, transitions back to h1b_active with the new employer."
+    },
+    {
+      "key": "h1b_extension_pending",
+      "label": "H-1B Extension Pending",
+      "track": "h1b",
+      "sponsorship_required": true,
+      "work_authorized": true,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [
+        "i797c_receipt_notice",
+        "expired_i797_approval_notice",
+        "i94"
+      ],
+      "is_overlay": false,
+      "placeholder": false,
+      "grace_period_days": null,
+      "notes": "Extension may be filed up to 6 months before expiry; the 240-day rule permits continued work for the same employer while a timely-filed extension is pending (A.6). Eligibility: within the 6-year limit, or an AC21 basis - section 106(a) 1-year extensions if PERM/I-140 filed at least 365 days before the 6th year; section 104(c) 3-year extensions if I-140 approved but priority date not current. Traps: once priority date current for 1 year with no I-485 filed, further extensions are barred; I-140 must not be withdrawn within 180 days of approval."
+    },
+    {
+      "key": "h1b_amendment_pending",
+      "label": "H-1B Amendment Pending (Material Change)",
+      "track": "h1b",
+      "sponsorship_required": true,
+      "work_authorized": true,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [
+        "i797c_receipt_notice",
+        "prior_i797_approval_notice",
+        "i94"
+      ],
+      "is_overlay": false,
+      "placeholder": false,
+      "grace_period_days": null,
+      "notes": "Required for a material change: worksite outside the original metro area or significant role change; must be filed before or at the change (7.2, A.6). Staffing-critical: a placement worksite metro change must automatically trigger this amendment workflow (7.6). Beneficiary may continue working (portability-style, on filing) at the new terms. Requires updated per-worksite LCA, client letter, SOW, and itinerary."
+    },
+    {
+      "key": "perm_filed",
+      "label": "PERM Labor Certification Filed (GC Overlay)",
+      "track": "gc_overlay",
+      "sponsorship_required": true,
+      "work_authorized": false,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [],
+      "is_overlay": true,
+      "placeholder": false,
+      "grace_period_days": null,
+      "notes": "Green-card overlay: runs concurrently with the underlying nonimmigrant status (typically H-1B), which continues to govern work authorization (7.1). PERM filed with DOL; the eventual priority date is the date USCIS received the PERM-based I-140 chain start, i.e., the PERM filing date (A.7). A PERM/I-140 pending 365+ days supports AC21 106(a) 1-year H-1B extensions."
+    },
+    {
+      "key": "perm_approved",
+      "label": "PERM Approved (GC Overlay)",
+      "track": "gc_overlay",
+      "sponsorship_required": true,
+      "work_authorized": false,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [],
+      "is_overlay": true,
+      "placeholder": false,
+      "grace_period_days": null,
+      "notes": "Overlay status; work authorization still comes from the underlying status. Critical deadline: approved PERM is valid for 180 days - the I-140 must be filed within that window (Appendix B: PERM validity 180 days to file I-140). Notification engine must track this date aggressively."
+    },
+    {
+      "key": "i140_pending",
+      "label": "I-140 Pending (GC Overlay)",
+      "track": "gc_overlay",
+      "sponsorship_required": true,
+      "work_authorized": false,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [],
+      "is_overlay": true,
+      "placeholder": false,
+      "grace_period_days": null,
+      "notes": "Overlay status; underlying status governs work authorization. I-140 premium processing available: 15 business days (A.7). Priority date fixed at PERM receipt date (or I-140 receipt where PERM-exempt). Concurrent filing with I-485 + I-765 + I-131 permitted when the priority date is current (7.4, A.7)."
+    },
+    {
+      "key": "i140_approved",
+      "label": "I-140 Approved (GC Overlay)",
+      "track": "gc_overlay",
+      "sponsorship_required": true,
+      "work_authorized": false,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [],
+      "is_overlay": true,
+      "placeholder": false,
+      "grace_period_days": null,
+      "notes": "Overlay status; underlying status governs work authorization. Enables AC21 104(c) 3-year H-1B extensions while priority date is not current (per-country backlog). Traps (A.6): once the priority date is current for 1 year with no I-485 filed, further H-1B extensions are barred (the 'one year to file I-485' clock, Appendix B); the I-140 must not be withdrawn within 180 days of approval to preserve benefits. Next step gated on priority date currency per the controlling Visa Bulletin chart (Final Action Dates vs Dates for Filing)."
+    },
+    {
+      "key": "i485_pending",
+      "label": "I-485 Adjustment of Status Pending (GC Overlay)",
+      "track": "gc_overlay",
+      "sponsorship_required": true,
+      "work_authorized": true,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [
+        "ead_card_c9",
+        "i797c_receipt_notice"
+      ],
+      "is_overlay": true,
+      "placeholder": false,
+      "grace_period_days": null,
+      "notes": "Overlay status; work authorization available via the (c)(9) EAD issued during pendency, or via the maintained underlying status (e.g., H-1B) if the employee stays on it (A.7). Renew EAD + Advance Parole continuously; AP prevents abandonment on travel. Retrogression keeps the I-485 pending without resetting the priority date. Same-or-similar portability (106(c)): once I-485 pending 180+ days with I-140 approved, the employee may change to a same-or-similar job and keep the pending application. Approval transitions to permanent_resident."
+    },
+    {
+      "key": "consular_pending",
+      "label": "Consular Processing Pending (GC Overlay)",
+      "track": "gc_overlay",
+      "sponsorship_required": true,
+      "work_authorized": false,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [],
+      "is_overlay": true,
+      "placeholder": false,
+      "grace_period_days": null,
+      "notes": "Overlay status: immigrant visa processed at a US consulate abroad instead of I-485 adjustment (A.7). No US work authorization derives from this path itself - the employee works on the underlying status if in the US, or is abroad awaiting the immigrant visa. Consular processing (vs change of status) also affects the $100k supplemental H-1B fee applicability and cap-gap eligibility (7.4). Visa issuance and admission transition to permanent_resident."
+    },
+    {
+      "key": "l1",
+      "label": "L-1 Intracompany Transferee (Placeholder)",
+      "track": "other",
+      "sponsorship_required": true,
+      "work_authorized": true,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [
+        "i797_approval_notice",
+        "i94"
+      ],
+      "is_overlay": false,
+      "placeholder": true,
+      "grace_period_days": null,
+      "notes": "Extensibility placeholder per 7.1 - the firm does not currently hire this category. Full rules (L-1A/L-1B max stay, blanket petitions, grace periods) must be authored as versioned rules data with counsel sign-off before use; adding the category must be data, not code."
+    },
+    {
+      "key": "o1",
+      "label": "O-1 Extraordinary Ability (Placeholder)",
+      "track": "other",
+      "sponsorship_required": true,
+      "work_authorized": true,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [
+        "i797_approval_notice",
+        "i94"
+      ],
+      "is_overlay": false,
+      "placeholder": true,
+      "grace_period_days": null,
+      "notes": "Extensibility placeholder per 7.1 - the firm does not currently hire this category. Full rules (validity periods, agent petitions, itinerary requirements) must be authored as versioned rules data with counsel sign-off before use."
+    },
+    {
+      "key": "tn",
+      "label": "TN NAFTA/USMCA Professional (Placeholder)",
+      "track": "other",
+      "sponsorship_required": true,
+      "work_authorized": true,
+      "work_authorized_conditional": false,
+      "work_authorization_evidence": [
+        "i94_with_tn_endorsement"
+      ],
+      "is_overlay": false,
+      "placeholder": true,
+      "grace_period_days": null,
+      "notes": "Extensibility placeholder per 7.1 - the firm does not currently hire this category. Full rules (eligible professions, Canadian vs Mexican procedures, 3-year increments) must be authored as versioned rules data with counsel sign-off before use."
+    }
+  ]
+}

@@ -1,0 +1,1357 @@
+{
+  "domain": "transitions",
+  "generated_at": "2026-07-06",
+  "transitions": [
+    {
+      "key": "f1_studying__f1_cpt",
+      "from_status": "f1_studying",
+      "to_status": "f1_cpt",
+      "transition_type": "filing",
+      "preconditions": [
+        {
+          "description": "Enrolled one full academic year before CPT begins (narrow regulatory exceptions apply)",
+          "rule_ref": "f1-practical-training-min-enrollment"
+        },
+        {
+          "description": "CPT employment is integral to the established curriculum (required practicum, cooperative agreement, or course credit)",
+          "rule_ref": "cpt-integral-curriculum-definition"
+        },
+        {
+          "description": "Cumulative full-time CPT tracked: 12 or more months of full-time CPT eliminates OPT eligibility at that degree level",
+          "rule_ref": "cpt-full-time-12mo-eliminates-opt"
+        }
+      ],
+      "required_documents": [
+        "form_i20_cpt_endorsement",
+        "enrollment_verification",
+        "cpt_offer_letter",
+        "course_registration_proof"
+      ],
+      "timing_window": {
+        "description": "Per academic program; the DSO authorizes each CPT period on the I-20; no USCIS filing and no EAD is issued",
+        "earliest": "After one full academic year of enrollment (limited exceptions for certain graduate programs)",
+        "latest": "DSO authorization must be on the I-20 before CPT employment begins"
+      },
+      "responsible_parties": [
+        "employee",
+        "dso"
+      ],
+      "notification_date_types": [
+        "cpt_end_date",
+        "cumulative_full_time_cpt_months"
+      ],
+      "edge_branches": [
+        "dso_denial_no_uscis_filing_so_no_rfe",
+        "dso_reauthorization_request_refile_equivalent",
+        "cpt_12_month_full_time_opt_bar"
+      ],
+      "spec_ref": "7.2, A.1"
+    },
+    {
+      "key": "f1_cpt__f1_opt",
+      "from_status": "f1_cpt",
+      "to_status": "f1_opt",
+      "transition_type": "filing",
+      "preconditions": [
+        {
+          "description": "Degree level is completing (post-completion OPT tied to program end date)",
+          "rule_ref": "opt-completion-window-months"
+        },
+        {
+          "description": "Cumulative full-time CPT is under 12 months at this degree level",
+          "rule_ref": "cpt-full-time-12mo-eliminates-opt"
+        },
+        {
+          "description": "OPT not already used at this degree level; any pre-completion OPT used is deducted from the 12 months",
+          "rule_ref": "opt-duration-months"
+        }
+      ],
+      "required_documents": [
+        "form_i765",
+        "form_i20_opt_recommendation",
+        "passport_biographic_page",
+        "i94_record",
+        "passport_style_photos",
+        "uscis_filing_fee_payment"
+      ],
+      "timing_window": {
+        "description": "Application window spans the end of the academic program; work may begin only on the EAD start date with card in hand",
+        "earliest": "90 days before program end date",
+        "latest": "60 days after program end date; USCIS must receive the I-765 within 30 days of the DSO's SEVIS recommendation"
+      },
+      "responsible_parties": [
+        "employee",
+        "dso",
+        "uscis"
+      ],
+      "notification_date_types": [
+        "opt_application_window_open",
+        "program_end_date",
+        "ead_start",
+        "ead_expiry",
+        "opt_end",
+        "opt_unemployment_clock"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial",
+        "refile",
+        "withdrawal"
+      ],
+      "spec_ref": "7.2, A.2"
+    },
+    {
+      "key": "f1_studying__f1_opt",
+      "from_status": "f1_studying",
+      "to_status": "f1_opt",
+      "transition_type": "filing",
+      "preconditions": [
+        {
+          "description": "Degree level is completing; student never used CPT or used less than 12 months full-time CPT",
+          "rule_ref": "opt-completion-window-months"
+        },
+        {
+          "description": "OPT not already used at this degree level; pre-completion OPT used is deducted",
+          "rule_ref": "opt-duration-months"
+        }
+      ],
+      "required_documents": [
+        "form_i765",
+        "form_i20_opt_recommendation",
+        "passport_biographic_page",
+        "i94_record",
+        "passport_style_photos",
+        "uscis_filing_fee_payment"
+      ],
+      "timing_window": {
+        "description": "Same window as f1_cpt__f1_opt; direct path for students who did not use CPT",
+        "earliest": "90 days before program end date",
+        "latest": "60 days after program end date; USCIS must receive the I-765 within 30 days of the DSO's SEVIS recommendation"
+      },
+      "responsible_parties": [
+        "employee",
+        "dso",
+        "uscis"
+      ],
+      "notification_date_types": [
+        "opt_application_window_open",
+        "program_end_date",
+        "ead_start",
+        "ead_expiry",
+        "opt_end",
+        "opt_unemployment_clock"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial",
+        "refile",
+        "withdrawal"
+      ],
+      "spec_ref": "7.2 (inferred direct path), A.2"
+    },
+    {
+      "key": "f1_opt__f1_stem_opt",
+      "from_status": "f1_opt",
+      "to_status": "f1_stem_opt",
+      "transition_type": "extension",
+      "preconditions": [
+        {
+          "description": "Qualifying STEM CIP degree on the DHS designated degree list",
+          "rule_ref": "stem-opt-degree-requirements"
+        },
+        {
+          "description": "Employer is enrolled in E-Verify and in good standing",
+          "rule_ref": "stem-opt-employer-everify-required"
+        },
+        {
+          "description": "Form I-983 training plan completed and signed by employer and student",
+          "rule_ref": "stem-opt-i983-training-plan-required"
+        },
+        {
+          "description": "STEM extension used no more than once per qualifying degree level (24 months)",
+          "rule_ref": "stem-opt-lifetime-max-extensions"
+        }
+      ],
+      "required_documents": [
+        "form_i765",
+        "form_i983",
+        "form_i20_stem_recommendation",
+        "ead_card",
+        "degree_diploma_or_transcript",
+        "employer_everify_id_evidence"
+      ],
+      "timing_window": {
+        "description": "Timely filing auto-extends work authorization up to 180 days past OPT EAD expiry while the application is pending",
+        "earliest": "Up to 90 days before the current OPT EAD expiry",
+        "latest": "USCIS must receive within 60 days of the DSO's STEM recommendation and before the OPT EAD expires"
+      },
+      "responsible_parties": [
+        "employee",
+        "dso",
+        "hr",
+        "uscis"
+      ],
+      "notification_date_types": [
+        "stem_ead_expiry",
+        "stem_180_day_auto_extension_boundary",
+        "stem_validation_6_month",
+        "stem_validation_12_month",
+        "stem_validation_18_month",
+        "stem_validation_24_month",
+        "ead_expiry",
+        "stem_unemployment_clock"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial",
+        "refile",
+        "withdrawal",
+        "auto_extension_180_days_while_pending",
+        "material_change_report_within_10_days",
+        "sevis_failure_to_report_termination"
+      ],
+      "spec_ref": "7.2, 7.4, A.3"
+    },
+    {
+      "key": "f1_opt__h1b_active",
+      "from_status": "f1_opt",
+      "to_status": "h1b_active",
+      "transition_type": "change_of_status",
+      "preconditions": [
+        {
+          "description": "Selected in the H-1B cap registration (65,000 regular + 20,000 US master's; wage-weighted selection effective Feb 27, 2026 requires SOC code and OEWS wage level at registration)",
+          "rule_ref": "h1b-selection-methodology-wage-weighted"
+        },
+        {
+          "description": "Timely nonfrivolous petition filed within the 90-day window after selection",
+          "rule_ref": "h1b-petition-filing-window-minimum"
+        },
+        {
+          "description": "Petition requests change of status, not consular processing (affects cap-gap availability and $100,000 supplemental fee applicability)",
+          "rule_ref": "capgap-consular-processing-eligible"
+        },
+        {
+          "description": "Certified LCA for the worksite(s)",
+          "rule_ref": "h1b-certified-lca-required"
+        }
+      ],
+      "required_documents": [
+        "h1b_registration_selection_notice",
+        "form_i129",
+        "certified_lca",
+        "degree_evidence",
+        "passport_biographic_page",
+        "i94_record",
+        "ead_card",
+        "opt_i20"
+      ],
+      "timing_window": {
+        "description": "Annual cap cycle: registration in March (FY2027: Mar 4-19, 2026, $215 per registration, selections by Mar 31, 2026); petition filing window ~Apr 1 to Jun 30; employment start Oct 1 or later",
+        "earliest": "Registration in March of the fiscal-year cycle; petition filing from selection notice",
+        "latest": "Petition within the 90-day filing window after selection; start date Oct 1 or later"
+      },
+      "responsible_parties": [
+        "hr",
+        "attorney",
+        "uscis"
+      ],
+      "notification_date_types": [
+        "h1b_registration_window_open",
+        "h1b_petition_filing_deadline",
+        "h1b_start_date",
+        "ead_expiry",
+        "cap_gap_april_1_cutoff",
+        "rfe_response_deadline"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial",
+        "refile",
+        "withdrawal",
+        "cap_gap_activation",
+        "consular_vs_cos_100k_fee_applicability"
+      ],
+      "spec_ref": "7.2, 7.4, A.4, A.5"
+    },
+    {
+      "key": "f1_stem_opt__h1b_active",
+      "from_status": "f1_stem_opt",
+      "to_status": "h1b_active",
+      "transition_type": "change_of_status",
+      "preconditions": [
+        {
+          "description": "Selected in the H-1B cap registration (wage-weighted selection effective Feb 27, 2026)",
+          "rule_ref": "h1b-selection-methodology-wage-weighted"
+        },
+        {
+          "description": "Timely nonfrivolous petition filed within the 90-day window after selection",
+          "rule_ref": "h1b-petition-filing-window-minimum"
+        },
+        {
+          "description": "Petition requests change of status, not consular processing",
+          "rule_ref": "capgap-consular-processing-eligible"
+        },
+        {
+          "description": "Certified LCA for the worksite(s)",
+          "rule_ref": "h1b-certified-lca-required"
+        }
+      ],
+      "required_documents": [
+        "h1b_registration_selection_notice",
+        "form_i129",
+        "certified_lca",
+        "degree_evidence",
+        "passport_biographic_page",
+        "i94_record",
+        "ead_card",
+        "stem_i20",
+        "form_i983"
+      ],
+      "timing_window": {
+        "description": "Same annual cap cycle as f1_opt__h1b_active; STEM OPT validity often bridges to the Oct 1 start without needing cap-gap",
+        "earliest": "Registration in March of the fiscal-year cycle; petition filing from selection notice",
+        "latest": "Petition within the 90-day filing window after selection; start date Oct 1 or later"
+      },
+      "responsible_parties": [
+        "hr",
+        "attorney",
+        "uscis"
+      ],
+      "notification_date_types": [
+        "h1b_registration_window_open",
+        "h1b_petition_filing_deadline",
+        "h1b_start_date",
+        "stem_ead_expiry",
+        "cap_gap_april_1_cutoff",
+        "rfe_response_deadline"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial",
+        "refile",
+        "withdrawal",
+        "cap_gap_activation",
+        "consular_vs_cos_100k_fee_applicability"
+      ],
+      "spec_ref": "7.2, 7.4, A.4, A.5"
+    },
+    {
+      "key": "f1_opt__h1b_cap_gap",
+      "from_status": "f1_opt",
+      "to_status": "h1b_cap_gap",
+      "transition_type": "automatic",
+      "preconditions": [
+        {
+          "description": "Timely-filed cap-subject H-1B petition requesting change of status (not consular processing)",
+          "rule_ref": "capgap-consular-processing-eligible"
+        },
+        {
+          "description": "OPT active at filing extends status AND work authorization; filing during the 60-day grace extends status only",
+          "rule_ref": "capgap-work-auth-extension-condition"
+        },
+        {
+          "description": "Employer is not cap-exempt (cap-gap unavailable for cap-exempt petitions)",
+          "rule_ref": "capgap-cap-exempt-petition-eligible"
+        }
+      ],
+      "required_documents": [
+        "form_i797c_receipt_notice",
+        "cap_gap_i20"
+      ],
+      "timing_window": {
+        "description": "Activates automatically on timely filing; under the H-1B modernization rule effective Jan 17, 2025, cap-gap now runs to April 1 of the relevant fiscal year (previously Oct 1)",
+        "earliest": "Automatic on USCIS receipt of the timely cap-subject COS petition",
+        "latest": "Ends April 1 of the relevant fiscal year, or on petition approval start date, denial, or withdrawal, whichever comes first"
+      },
+      "responsible_parties": [
+        "system",
+        "dso"
+      ],
+      "notification_date_types": [
+        "cap_gap_april_1_cutoff",
+        "opt_unemployment_clock",
+        "ead_expiry"
+      ],
+      "edge_branches": [
+        "active_opt_extends_status_and_work_auth",
+        "grace_period_extends_status_only",
+        "denial_ends_cap_gap_60_day_grace",
+        "withdrawal_ends_cap_gap",
+        "unemployment_clock_not_paused"
+      ],
+      "spec_ref": "7.2, 7.4, A.4"
+    },
+    {
+      "key": "f1_stem_opt__h1b_cap_gap",
+      "from_status": "f1_stem_opt",
+      "to_status": "h1b_cap_gap",
+      "transition_type": "automatic",
+      "preconditions": [
+        {
+          "description": "Timely-filed cap-subject H-1B petition requesting change of status (not consular processing)",
+          "rule_ref": "capgap-consular-processing-eligible"
+        },
+        {
+          "description": "STEM OPT active at filing extends status AND work authorization; filing during the 60-day grace extends status only",
+          "rule_ref": "capgap-work-auth-extension-condition"
+        },
+        {
+          "description": "Employer is not cap-exempt",
+          "rule_ref": "capgap-cap-exempt-petition-eligible"
+        }
+      ],
+      "required_documents": [
+        "form_i797c_receipt_notice",
+        "cap_gap_i20"
+      ],
+      "timing_window": {
+        "description": "Same automatic activation and April 1 boundary as f1_opt__h1b_cap_gap; STEM unemployment clock (150-day aggregate) continues to run",
+        "earliest": "Automatic on USCIS receipt of the timely cap-subject COS petition",
+        "latest": "Ends April 1 of the relevant fiscal year, or on petition approval start date, denial, or withdrawal, whichever comes first"
+      },
+      "responsible_parties": [
+        "system",
+        "dso"
+      ],
+      "notification_date_types": [
+        "cap_gap_april_1_cutoff",
+        "stem_unemployment_clock",
+        "stem_ead_expiry"
+      ],
+      "edge_branches": [
+        "active_opt_extends_status_and_work_auth",
+        "grace_period_extends_status_only",
+        "denial_ends_cap_gap_60_day_grace",
+        "withdrawal_ends_cap_gap",
+        "unemployment_clock_not_paused",
+        "stem_reporting_obligations_continue"
+      ],
+      "spec_ref": "7.2, 7.4, A.4"
+    },
+    {
+      "key": "h1b_cap_gap__h1b_active",
+      "from_status": "h1b_cap_gap",
+      "to_status": "h1b_active",
+      "transition_type": "decision",
+      "preconditions": [
+        {
+          "description": "Cap-subject change-of-status petition approved by USCIS",
+          "rule_ref": null
+        },
+        {
+          "description": "H-1B start date reached (Oct 1 or the approval's effective start date)",
+          "rule_ref": "h1b-fy2027-earliest-employment-start"
+        }
+      ],
+      "required_documents": [
+        "form_i797_approval_notice",
+        "i94_record"
+      ],
+      "timing_window": {
+        "description": "Status activates on the petition's start date; I-9 during cap-gap is documented with the H-1B receipt (I-797C) plus the cap-gap I-20",
+        "earliest": "Petition approval",
+        "latest": "H-1B start date (Oct 1 or later per approval)"
+      },
+      "responsible_parties": [
+        "uscis",
+        "hr"
+      ],
+      "notification_date_types": [
+        "h1b_validity_expiry",
+        "i94_expiry",
+        "i9_reverification_due"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial_reverts_to_remaining_opt_or_60_day_grace",
+        "refile_requires_new_cap_registration_next_fiscal_year",
+        "withdrawal_ends_cap_gap"
+      ],
+      "spec_ref": "7.2, 7.4, A.4"
+    },
+    {
+      "key": "h1b_active__h1b_transfer_pending",
+      "from_status": "h1b_active",
+      "to_status": "h1b_transfer_pending",
+      "transition_type": "filing",
+      "preconditions": [
+        {
+          "description": "Beneficiary previously counted against the cap and in valid H-1B status",
+          "rule_ref": "h1b-portability-eligibility-conditions"
+        },
+        {
+          "description": "New employer files a nonfrivolous I-129 petition; AC21 section 105 portability permits work for the new employer upon USCIS receipt",
+          "rule_ref": "h1b-portability-start-upon-filing"
+        },
+        {
+          "description": "Certified LCA for the new employer's worksite(s)",
+          "rule_ref": "h1b-certified-lca-required"
+        }
+      ],
+      "required_documents": [
+        "form_i129",
+        "certified_lca",
+        "form_i797_prior_approval",
+        "recent_paystubs",
+        "passport_biographic_page",
+        "i94_record",
+        "client_letter",
+        "statement_of_work"
+      ],
+      "timing_window": {
+        "description": "Portability filing; new employment may begin on USCIS receipt of the transfer petition",
+        "earliest": "Any time while the beneficiary holds valid H-1B status",
+        "latest": "Before I-94/status expiry (or within the 60-day grace period following termination)"
+      },
+      "responsible_parties": [
+        "hr",
+        "attorney",
+        "uscis"
+      ],
+      "notification_date_types": [
+        "rfe_response_deadline",
+        "i94_expiry",
+        "h1b_validity_expiry"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial",
+        "refile",
+        "withdrawal",
+        "portability_work_on_receipt",
+        "filed_during_60_day_grace"
+      ],
+      "spec_ref": "7.2, 7.4, A.6"
+    },
+    {
+      "key": "h1b_transfer_pending__h1b_active",
+      "from_status": "h1b_transfer_pending",
+      "to_status": "h1b_active",
+      "transition_type": "decision",
+      "preconditions": [
+        {
+          "description": "Transfer petition approved by USCIS",
+          "rule_ref": null
+        }
+      ],
+      "required_documents": [
+        "form_i797_approval_notice",
+        "i94_record"
+      ],
+      "timing_window": {
+        "description": "New validity period per the approval notice",
+        "earliest": "Approval date",
+        "latest": "Per approval notice validity dates"
+      },
+      "responsible_parties": [
+        "uscis",
+        "hr"
+      ],
+      "notification_date_types": [
+        "h1b_validity_expiry",
+        "i94_expiry"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial_remain_with_prior_employer_or_grace",
+        "refile",
+        "withdrawal"
+      ],
+      "spec_ref": "7.2, 7.4, A.6"
+    },
+    {
+      "key": "h1b_active__h1b_extension_pending",
+      "from_status": "h1b_active",
+      "to_status": "h1b_extension_pending",
+      "transition_type": "extension",
+      "preconditions": [
+        {
+          "description": "Within the 6-year maximum stay (typically 3+3), OR an AC21 basis applies",
+          "rule_ref": "h1b-max-stay-6-years"
+        },
+        {
+          "description": "AC21 section 106(a): 1-year extensions if PERM or I-140 was filed 365+ days before the end of the 6th year and not finally decided",
+          "rule_ref": "ac21-106a-365-day-requirement"
+        },
+        {
+          "description": "AC21 section 104(c): 3-year extensions if I-140 approved but priority date not current",
+          "rule_ref": "ac21-104c-extension-3-years"
+        }
+      ],
+      "required_documents": [
+        "form_i129",
+        "certified_lca",
+        "form_i797_prior_approval",
+        "recent_paystubs",
+        "passport_biographic_page",
+        "i94_record"
+      ],
+      "timing_window": {
+        "description": "The 240-day rule permits continued work for the same employer while a timely-filed extension is pending",
+        "earliest": "Up to 6 months before the current validity expiry",
+        "latest": "Before current status expiry (timely filing required to preserve the 240-day work authorization)"
+      },
+      "responsible_parties": [
+        "hr",
+        "attorney",
+        "uscis"
+      ],
+      "notification_date_types": [
+        "h1b_validity_expiry",
+        "h1b_extension_filing_window",
+        "h1b_240_day_work_authorization_boundary",
+        "rfe_response_deadline"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial",
+        "refile",
+        "withdrawal"
+      ],
+      "spec_ref": "7.2, A.6"
+    },
+    {
+      "key": "h1b_extension_pending__h1b_active",
+      "from_status": "h1b_extension_pending",
+      "to_status": "h1b_active",
+      "transition_type": "decision",
+      "preconditions": [
+        {
+          "description": "Extension petition approved by USCIS",
+          "rule_ref": null
+        }
+      ],
+      "required_documents": [
+        "form_i797_approval_notice",
+        "i94_record"
+      ],
+      "timing_window": {
+        "description": "New validity period per the approval notice",
+        "earliest": "Approval date",
+        "latest": "Per approval notice validity dates"
+      },
+      "responsible_parties": [
+        "uscis",
+        "hr"
+      ],
+      "notification_date_types": [
+        "h1b_validity_expiry",
+        "i94_expiry"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial_work_authorization_ends",
+        "refile",
+        "withdrawal"
+      ],
+      "spec_ref": "7.2, A.6"
+    },
+    {
+      "key": "h1b_active__h1b_amendment_pending",
+      "from_status": "h1b_active",
+      "to_status": "h1b_amendment_pending",
+      "transition_type": "filing",
+      "preconditions": [
+        {
+          "description": "Material change: new worksite outside the original metropolitan area or a significant role change",
+          "rule_ref": "h1b-amendment-required-simeio-precedent"
+        },
+        {
+          "description": "New certified LCA for the new worksite; for placements, the amended-petition workflow is triggered automatically when a placement's worksite changes metro area",
+          "rule_ref": "h1b-certified-lca-required"
+        }
+      ],
+      "required_documents": [
+        "form_i129_amendment",
+        "certified_lca_new_worksite",
+        "client_letter",
+        "statement_of_work",
+        "itinerary"
+      ],
+      "timing_window": {
+        "description": "Amendment must be filed before or at the time the material change takes effect",
+        "earliest": "As soon as the material change (worksite/role) is known",
+        "latest": "Before or at the time the change takes effect"
+      },
+      "responsible_parties": [
+        "hr",
+        "attorney",
+        "uscis"
+      ],
+      "notification_date_types": [
+        "rfe_response_deadline",
+        "h1b_validity_expiry"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial",
+        "refile",
+        "withdrawal",
+        "worksite_metro_change_trigger"
+      ],
+      "spec_ref": "7.2, 7.4, 7.6, A.6"
+    },
+    {
+      "key": "h1b_amendment_pending__h1b_active",
+      "from_status": "h1b_amendment_pending",
+      "to_status": "h1b_active",
+      "transition_type": "decision",
+      "preconditions": [
+        {
+          "description": "Amended petition approved by USCIS",
+          "rule_ref": null
+        }
+      ],
+      "required_documents": [
+        "form_i797_approval_notice"
+      ],
+      "timing_window": {
+        "description": "Amended terms effective per the approval notice",
+        "earliest": "Approval date",
+        "latest": "Per approval notice validity dates"
+      },
+      "responsible_parties": [
+        "uscis",
+        "hr"
+      ],
+      "notification_date_types": [
+        "h1b_validity_expiry"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial",
+        "refile",
+        "withdrawal"
+      ],
+      "spec_ref": "7.2, 7.6, A.6"
+    },
+    {
+      "key": "h1b_active__perm_filed",
+      "from_status": "h1b_active",
+      "to_status": "perm_filed",
+      "transition_type": "filing",
+      "preconditions": [
+        {
+          "description": "Employer green-card sponsorship decision made",
+          "rule_ref": null
+        },
+        {
+          "description": "Prevailing wage determination obtained and DOL-compliant recruitment completed before ETA-9089 filing",
+          "rule_ref": "perm-to-i485-total-path"
+        },
+        {
+          "description": "For AC21 106(a) benefit, PERM (or I-140) should be filed 365+ days before the end of the 6th H-1B year",
+          "rule_ref": "ac21-106a-365-day-requirement"
+        }
+      ],
+      "required_documents": [
+        "prevailing_wage_determination",
+        "recruitment_evidence",
+        "form_eta_9089",
+        "job_description"
+      ],
+      "timing_window": {
+        "description": "PERM may be started at any time; the filing date becomes the priority date once received",
+        "earliest": "Any time during employment",
+        "latest": "None, but file 365+ days before the 6th-year H-1B limit to preserve AC21 106(a) extensions"
+      },
+      "responsible_parties": [
+        "employer",
+        "attorney",
+        "dol"
+      ],
+      "notification_date_types": [
+        "priority_date_established",
+        "ac21_365_day_marker",
+        "h1b_validity_expiry"
+      ],
+      "edge_branches": [
+        "dol_audit",
+        "supervised_recruitment",
+        "denial",
+        "refile",
+        "withdrawal"
+      ],
+      "spec_ref": "7.2, A.6, A.7"
+    },
+    {
+      "key": "perm_filed__perm_approved",
+      "from_status": "perm_filed",
+      "to_status": "perm_approved",
+      "transition_type": "decision",
+      "preconditions": [
+        {
+          "description": "DOL certifies the ETA-9089 labor certification",
+          "rule_ref": "perm-to-i485-total-path"
+        }
+      ],
+      "required_documents": [
+        "certified_eta_9089"
+      ],
+      "timing_window": {
+        "description": "Per DOL processing times; audits and supervised recruitment extend the timeline",
+        "earliest": "Per DOL processing",
+        "latest": "Per DOL processing"
+      },
+      "responsible_parties": [
+        "dol",
+        "attorney"
+      ],
+      "notification_date_types": [
+        "perm_validity_180_day"
+      ],
+      "edge_branches": [
+        "dol_audit",
+        "supervised_recruitment",
+        "denial",
+        "refile",
+        "withdrawal"
+      ],
+      "spec_ref": "7.2, A.7"
+    },
+    {
+      "key": "perm_approved__i140_pending",
+      "from_status": "perm_approved",
+      "to_status": "i140_pending",
+      "transition_type": "filing",
+      "preconditions": [
+        {
+          "description": "I-140 filed within 180 days of PERM certification (PERM validity window)",
+          "rule_ref": "perm-certification-validity-days"
+        },
+        {
+          "description": "Employer demonstrates ability to pay the proffered wage from the priority date",
+          "rule_ref": "i140-ability-to-pay-required"
+        }
+      ],
+      "required_documents": [
+        "form_i140",
+        "certified_eta_9089",
+        "ability_to_pay_evidence",
+        "degree_evidence",
+        "experience_letters"
+      ],
+      "timing_window": {
+        "description": "Premium processing available (15 business days); priority date fixed as the PERM receipt date",
+        "earliest": "Upon PERM certification",
+        "latest": "Within 180 days of PERM certification"
+      },
+      "responsible_parties": [
+        "employer",
+        "attorney",
+        "uscis"
+      ],
+      "notification_date_types": [
+        "perm_validity_180_day",
+        "rfe_response_deadline"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial",
+        "refile",
+        "withdrawal",
+        "premium_processing_15_business_days"
+      ],
+      "spec_ref": "7.2, A.7"
+    },
+    {
+      "key": "perm_approved__i485_pending",
+      "from_status": "perm_approved",
+      "to_status": "i485_pending",
+      "transition_type": "filing",
+      "preconditions": [
+        {
+          "description": "Concurrent filing of I-140 + I-485 + I-765 (EAD) + I-131 (AP) permitted when the priority date is current",
+          "rule_ref": "concurrent-filing-allowed"
+        },
+        {
+          "description": "Priority date current per the governing Visa Bulletin chart (Final Action Dates or Dates for Filing, as USCIS designates monthly)",
+          "rule_ref": "uscis-monthly-chart-designation"
+        },
+        {
+          "description": "I-140 component filed within 180 days of PERM certification",
+          "rule_ref": "perm-certification-validity-days"
+        }
+      ],
+      "required_documents": [
+        "form_i140",
+        "form_i485",
+        "form_i765",
+        "form_i131",
+        "form_i693_medical_exam",
+        "certified_eta_9089",
+        "birth_certificate",
+        "passport_biographic_page",
+        "i94_record"
+      ],
+      "timing_window": {
+        "description": "Concurrent-filing package models the section 7.4 concurrent filing edge case; retrogression after filing keeps the I-485 pending without resetting the priority date",
+        "earliest": "When the priority date is current per the governing chart",
+        "latest": "Within 180 days of PERM certification for the I-140 component"
+      },
+      "responsible_parties": [
+        "employer",
+        "attorney",
+        "employee",
+        "uscis"
+      ],
+      "notification_date_types": [
+        "priority_date_approaching_current",
+        "ead_ap_renewal",
+        "rfe_response_deadline",
+        "perm_validity_180_day"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial",
+        "refile",
+        "withdrawal",
+        "retrogression"
+      ],
+      "spec_ref": "7.4, A.7"
+    },
+    {
+      "key": "i140_pending__i140_approved",
+      "from_status": "i140_pending",
+      "to_status": "i140_approved",
+      "transition_type": "decision",
+      "preconditions": [
+        {
+          "description": "USCIS approves the I-140 immigrant petition",
+          "rule_ref": null
+        }
+      ],
+      "required_documents": [
+        "form_i797_approval_notice"
+      ],
+      "timing_window": {
+        "description": "Per USCIS processing; premium processing 15 business days; the I-140 must not be withdrawn within 180 days of approval to preserve priority-date and AC21 benefits",
+        "earliest": "Per USCIS processing",
+        "latest": "Per USCIS processing"
+      },
+      "responsible_parties": [
+        "uscis",
+        "attorney"
+      ],
+      "notification_date_types": [
+        "priority_date_approaching_current",
+        "ac21_one_year_i485_clock",
+        "i140_withdrawal_180_day_boundary"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial",
+        "refile",
+        "i140_withdrawn_within_180_days_loses_benefits"
+      ],
+      "spec_ref": "7.2, 7.4, A.6, A.7"
+    },
+    {
+      "key": "i140_approved__i485_pending",
+      "from_status": "i140_approved",
+      "to_status": "i485_pending",
+      "transition_type": "filing",
+      "preconditions": [
+        {
+          "description": "Priority date current per the controlling Visa Bulletin chart (USCIS announces monthly whether Final Action Dates or Dates for Filing governs I-485 filing)",
+          "rule_ref": "uscis-monthly-chart-designation"
+        },
+        {
+          "description": "AC21 trap: once the priority date has been current for 1 year with no I-485 filed, further H-1B extensions are barred - file within the year",
+          "rule_ref": "ac21-106a-failure-to-file-bar"
+        }
+      ],
+      "required_documents": [
+        "form_i485",
+        "form_i765",
+        "form_i131",
+        "form_i693_medical_exam",
+        "form_i797_i140_approval",
+        "birth_certificate",
+        "passport_biographic_page",
+        "i94_record"
+      ],
+      "timing_window": {
+        "description": "File when the priority date becomes current; the platform alerts when the priority date is within ~6 months of current",
+        "earliest": "When the priority date is current per the controlling chart",
+        "latest": "Within 1 year of the priority date becoming current to preserve AC21 H-1B extension eligibility"
+      },
+      "responsible_parties": [
+        "attorney",
+        "employee",
+        "uscis"
+      ],
+      "notification_date_types": [
+        "ac21_one_year_i485_clock",
+        "priority_date_approaching_current",
+        "ead_ap_renewal",
+        "rfe_response_deadline"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial",
+        "refile",
+        "withdrawal",
+        "retrogression",
+        "concurrent_filing"
+      ],
+      "spec_ref": "7.2, 7.4, A.7"
+    },
+    {
+      "key": "i140_approved__consular_pending",
+      "from_status": "i140_approved",
+      "to_status": "consular_pending",
+      "transition_type": "filing",
+      "preconditions": [
+        {
+          "description": "Consular processing elected instead of adjustment of status (affects cap-gap availability and $100,000 supplemental fee applicability for H-1B pathways)",
+          "rule_ref": "h1b-proclamation-100k-supplemental-fee"
+        },
+        {
+          "description": "Priority date current per the Final Action Dates chart for visa issuance",
+          "rule_ref": "consular-fad-governs-issuance"
+        }
+      ],
+      "required_documents": [
+        "form_ds260",
+        "nvc_fee_receipts",
+        "civil_documents",
+        "police_certificates",
+        "passport_biographic_page",
+        "panel_physician_medical_exam"
+      ],
+      "timing_window": {
+        "description": "NVC processing then consular interview scheduling once the priority date is current",
+        "earliest": "When the priority date is current per the Final Action Dates chart",
+        "latest": "Per NVC and consulate scheduling"
+      },
+      "responsible_parties": [
+        "attorney",
+        "employee",
+        "dos"
+      ],
+      "notification_date_types": [
+        "priority_date_approaching_current",
+        "consular_interview_date",
+        "passport_expiry"
+      ],
+      "edge_branches": [
+        "retrogression",
+        "administrative_processing_221g",
+        "denial",
+        "refile"
+      ],
+      "spec_ref": "7.2, 7.4, A.7"
+    },
+    {
+      "key": "i140_approved__h1b_extension_pending",
+      "from_status": "i140_approved",
+      "to_status": "h1b_extension_pending",
+      "transition_type": "extension",
+      "preconditions": [
+        {
+          "description": "AC21 section 104(c): approved I-140 with priority date not current (per-country backlog) permits 3-year extensions beyond the 6-year limit",
+          "rule_ref": "ac21-104c-extension-3-years"
+        },
+        {
+          "description": "AC21 section 106(a): PERM or I-140 pending/filed 365+ days permits 1-year extensions",
+          "rule_ref": "ac21-106a-365-day-requirement"
+        },
+        {
+          "description": "Barred if the priority date has been current for 1 year with no I-485 filed",
+          "rule_ref": "ac21-106a-failure-to-file-bar"
+        },
+        {
+          "description": "I-140 must not have been withdrawn within 180 days of approval",
+          "rule_ref": "i140-auto-revocation-withdrawal-180-days"
+        }
+      ],
+      "required_documents": [
+        "form_i129",
+        "form_i797_i140_approval",
+        "certified_lca",
+        "recent_paystubs",
+        "passport_biographic_page",
+        "i94_record"
+      ],
+      "timing_window": {
+        "description": "Post-6th-year AC21 extension per section 7.7 seed rules; 240-day rule permits continued work while the timely-filed extension is pending",
+        "earliest": "Up to 6 months before the current H-1B validity expiry",
+        "latest": "Before current status expiry"
+      },
+      "responsible_parties": [
+        "hr",
+        "attorney",
+        "uscis"
+      ],
+      "notification_date_types": [
+        "h1b_validity_expiry",
+        "h1b_extension_filing_window",
+        "ac21_one_year_i485_clock",
+        "h1b_240_day_work_authorization_boundary"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial",
+        "refile",
+        "withdrawal"
+      ],
+      "spec_ref": "7.2, 7.4, 7.7, A.6"
+    },
+    {
+      "key": "i485_pending__permanent_resident",
+      "from_status": "i485_pending",
+      "to_status": "permanent_resident",
+      "transition_type": "decision",
+      "preconditions": [
+        {
+          "description": "USCIS approves the I-485; priority date current per the Final Action Dates chart at approval",
+          "rule_ref": "uscis-monthly-chart-designation"
+        },
+        {
+          "description": "During pendency: renew EAD and AP continuously; AP prevents abandonment on travel; retrogression keeps the I-485 pending without resetting the priority date",
+          "rule_ref": "retrogression-i485-held-in-abeyance"
+        }
+      ],
+      "required_documents": [
+        "form_i797_approval_notice",
+        "green_card"
+      ],
+      "timing_window": {
+        "description": "Per USCIS processing; interview may be required; retrogression can pause final action indefinitely without invalidating the pending application",
+        "earliest": "Per USCIS processing once the priority date is current for final action",
+        "latest": "Per USCIS processing"
+      },
+      "responsible_parties": [
+        "uscis",
+        "attorney",
+        "employee"
+      ],
+      "notification_date_types": [
+        "ead_ap_renewal",
+        "rfe_response_deadline",
+        "priority_date_approaching_current"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial",
+        "refile",
+        "interview_required",
+        "retrogression_keeps_i485_pending"
+      ],
+      "spec_ref": "7.2, 7.4, A.7"
+    },
+    {
+      "key": "consular_pending__permanent_resident",
+      "from_status": "consular_pending",
+      "to_status": "permanent_resident",
+      "transition_type": "decision",
+      "preconditions": [
+        {
+          "description": "Immigrant visa issued at the consular interview and beneficiary admitted to the US as a lawful permanent resident",
+          "rule_ref": null
+        }
+      ],
+      "required_documents": [
+        "immigrant_visa",
+        "passport_admission_stamp",
+        "green_card"
+      ],
+      "timing_window": {
+        "description": "Immigrant visa validity is limited; the beneficiary must be admitted before the visa expires",
+        "earliest": "Visa issuance after the consular interview",
+        "latest": "US admission before the immigrant visa expires"
+      },
+      "responsible_parties": [
+        "dos",
+        "employee",
+        "attorney"
+      ],
+      "notification_date_types": [
+        "consular_interview_date",
+        "immigrant_visa_expiry",
+        "passport_expiry"
+      ],
+      "edge_branches": [
+        "administrative_processing_221g",
+        "denial",
+        "refile",
+        "retrogression"
+      ],
+      "spec_ref": "7.1, 7.2, A.7"
+    },
+    {
+      "key": "i485_pending__i485_pending",
+      "from_status": "i485_pending",
+      "to_status": "i485_pending",
+      "transition_type": "filing",
+      "preconditions": [
+        {
+          "description": "Same-or-similar portability (AC21 section 106(c)): I-485 pending 180+ days AND I-140 approved",
+          "rule_ref": "ac21-204j-portability-pending-days"
+        },
+        {
+          "description": "New job is in the same or a similar occupational classification as the sponsored position",
+          "rule_ref": "ac21-same-or-similar-definition"
+        }
+      ],
+      "required_documents": [
+        "form_i485_supplement_j",
+        "new_job_offer_letter",
+        "form_i797_i140_approval"
+      ],
+      "timing_window": {
+        "description": "Job/employer change while keeping the pending I-485; priority date and application are preserved",
+        "earliest": "180 days after the I-485 was filed, with an approved I-140",
+        "latest": "Any time while the I-485 remains pending"
+      },
+      "responsible_parties": [
+        "employee",
+        "hr",
+        "attorney",
+        "uscis"
+      ],
+      "notification_date_types": [
+        "i485_180_day_portability_boundary",
+        "ead_ap_renewal",
+        "rfe_response_deadline"
+      ],
+      "edge_branches": [
+        "rfe",
+        "denial",
+        "refile",
+        "not_same_or_similar_risk"
+      ],
+      "spec_ref": "7.4, A.7"
+    },
+    {
+      "key": "h1b_active__h1b_active",
+      "from_status": "h1b_active",
+      "to_status": "h1b_active",
+      "transition_type": "grace",
+      "preconditions": [
+        {
+          "description": "Offboarding recorded with the employee's last day of employment; triggers the H-1B 60-day grace-period clock and notifies HR and counsel",
+          "rule_ref": "h1b-grace-period-60-days"
+        },
+        {
+          "description": "Grace runs up to 60 consecutive days or until I-94 expiry, whichever is earlier; beneficiary remains in H-1B status but without employment authorization for a new employer until a portability petition is received",
+          "rule_ref": "h1b-grace-period-60-days"
+        }
+      ],
+      "required_documents": [
+        "offboarding_checklist",
+        "petition_withdrawal_letter",
+        "lca_withdrawal_confirmation",
+        "return_transportation_offer"
+      ],
+      "timing_window": {
+        "description": "Section 8 offboarding trigger: the grace-period clock starts on the recorded last day; escalating notifications go to employee, HR, and counsel",
+        "earliest": "Last day of employment recorded at offboarding",
+        "latest": "60 days after termination or I-94 expiry, whichever is earlier"
+      },
+      "responsible_parties": [
+        "hr",
+        "employer",
+        "attorney",
+        "system"
+      ],
+      "notification_date_types": [
+        "h1b_grace_period_end",
+        "i94_expiry"
+      ],
+      "edge_branches": [
+        "transfer_filed_during_grace",
+        "change_of_status_filed_during_grace",
+        "departure_before_grace_end"
+      ],
+      "spec_ref": "8, 7.4"
+    },
+    {
+      "key": "f1_opt__f1_opt",
+      "from_status": "f1_opt",
+      "to_status": "f1_opt",
+      "transition_type": "grace",
+      "preconditions": [
+        {
+          "description": "Offboarding recorded: the OPT unemployment clock accrues against the 90-day aggregate limit counted from EAD start; days abroad count (narrow exceptions); cap-gap does not pause it",
+          "rule_ref": "opt-unemployment-limit-days"
+        },
+        {
+          "description": "Separately, a 60-day grace period follows OPT EAD expiry",
+          "rule_ref": "f1-grace-period-post-completion-days"
+        }
+      ],
+      "required_documents": [
+        "offboarding_checklist",
+        "sevis_employer_update"
+      ],
+      "timing_window": {
+        "description": "Section 8 offboarding trigger for F-1 OPT: unemployment days accrue until new qualifying employment (directly related to degree, 20+ hrs/week) is reported",
+        "earliest": "Day after the last day of OPT employment",
+        "latest": "SEVIS termination risk once aggregate unemployed days exceed 90; 60-day grace ends 60 days after EAD expiry"
+      },
+      "responsible_parties": [
+        "hr",
+        "employee",
+        "dso",
+        "system"
+      ],
+      "notification_date_types": [
+        "opt_unemployment_clock",
+        "ead_expiry",
+        "opt_grace_period_end"
+      ],
+      "edge_branches": [
+        "sevis_termination_on_exceeding_limit",
+        "new_employment_stops_accrual",
+        "cap_gap_does_not_pause_clock"
+      ],
+      "spec_ref": "8, 7.4, A.2"
+    },
+    {
+      "key": "f1_stem_opt__f1_stem_opt",
+      "from_status": "f1_stem_opt",
+      "to_status": "f1_stem_opt",
+      "transition_type": "grace",
+      "preconditions": [
+        {
+          "description": "Offboarding recorded: STEM unemployment clock accrues against the 150-day aggregate limit, inclusive of the 90 days already used on OPT (does not reset)",
+          "rule_ref": "stem-opt-unemployment-limit-days"
+        },
+        {
+          "description": "Employer must report the employee's departure to SEVP within 5 days; material changes reported within 10 days",
+          "rule_ref": "stem-opt-employer-report-departure-business-days"
+        }
+      ],
+      "required_documents": [
+        "offboarding_checklist",
+        "employer_departure_report",
+        "sevis_employer_update"
+      ],
+      "timing_window": {
+        "description": "Section 8 offboarding trigger for STEM OPT: departure report is due within 5 days; unemployment accrual continues until new qualifying E-Verify employment with a new I-983",
+        "earliest": "Day after the last day of STEM OPT employment",
+        "latest": "Employer departure report within 5 days; SEVIS termination risk once aggregate unemployed days exceed 150"
+      },
+      "responsible_parties": [
+        "hr",
+        "employer",
+        "employee",
+        "dso",
+        "system"
+      ],
+      "notification_date_types": [
+        "stem_unemployment_clock",
+        "employer_departure_report_5_day_deadline",
+        "stem_ead_expiry"
+      ],
+      "edge_branches": [
+        "sevis_termination_on_exceeding_limit",
+        "sevis_failure_to_report_termination",
+        "new_i983_required_for_new_employer"
+      ],
+      "spec_ref": "8, 7.4, A.3"
+    }
+  ]
+}

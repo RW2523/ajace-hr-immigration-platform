@@ -1,0 +1,27 @@
+{
+  "name": "hr-immigration-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "HR & Immigration Lifecycle Platform — monorepo",
+  "packageManager": "pnpm@11.10.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "db:start": "bash scripts/db-start.sh",
+    "db:migrate": "pnpm --filter @hr/db migrate",
+    "db:seed": "pnpm --filter @hr/db seed",
+    "db:reset": "pnpm --filter @hr/db reset"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

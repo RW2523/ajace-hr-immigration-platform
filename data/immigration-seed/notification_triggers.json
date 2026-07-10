@@ -1,0 +1,552 @@
+{
+  "domain": "notification_triggers",
+  "generated_at": "2026-07-06",
+  "triggers": [
+    {
+      "date_type": "i94_expiry",
+      "label": "I-94 admission record expiration",
+      "applies_to_statuses": ["h1b_active", "h1b_cap_gap", "h1b_transfer_pending", "h1b_extension_pending", "h1b_amendment_pending", "l1", "o1", "tn"],
+      "default_offsets_days": [120, 90, 60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [120, 90, 60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [14, 7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 9"
+    },
+    {
+      "date_type": "ead_start",
+      "label": "EAD start date (OPT unemployment-clock trigger; work may begin only with card in hand)",
+      "applies_to_statuses": ["f1_opt", "f1_stem_opt", "i485_pending"],
+      "default_offsets_days": [14, 7, 1, 0],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [14, 7, 1, 0] },
+        { "level": 2, "recipient": "hr", "at_offsets": [7, 1, 0] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [0] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 9; A.2"
+    },
+    {
+      "date_type": "ead_expiry",
+      "label": "EAD expiration",
+      "applies_to_statuses": ["f1_opt", "f1_stem_opt", "h1b_cap_gap", "i485_pending"],
+      "default_offsets_days": [120, 90, 60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [120, 90, 60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [14, 7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 9; A.2"
+    },
+    {
+      "date_type": "opt_end",
+      "label": "OPT end date",
+      "applies_to_statuses": ["f1_opt"],
+      "default_offsets_days": [120, 90, 60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [120, 90, 60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [14, 7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 9; A.2"
+    },
+    {
+      "date_type": "opt_unemployment_clock",
+      "label": "OPT unemployment clock approaching the 90-day aggregate limit (projected exhaustion date)",
+      "applies_to_statuses": ["f1_opt", "h1b_cap_gap"],
+      "default_offsets_days": [30, 14, 7, 3, 1, 0],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [30, 14, 7, 3, 1, 0] },
+        { "level": 2, "recipient": "hr", "at_offsets": [14, 7, 3, 1, 0] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [3, 1, 0] }
+      ],
+      "channels": ["email", "in_app", "slack"],
+      "spec_ref": "7.4; A.2; 9"
+    },
+    {
+      "date_type": "stem_unemployment_clock",
+      "label": "STEM OPT unemployment clock approaching the 150-day aggregate limit (inclusive of the 90 OPT days; projected exhaustion date)",
+      "applies_to_statuses": ["f1_stem_opt", "h1b_cap_gap"],
+      "default_offsets_days": [30, 14, 7, 3, 1, 0],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [30, 14, 7, 3, 1, 0] },
+        { "level": 2, "recipient": "hr", "at_offsets": [14, 7, 3, 1, 0] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [3, 1, 0] }
+      ],
+      "channels": ["email", "in_app", "slack"],
+      "spec_ref": "7.4; A.3; 9"
+    },
+    {
+      "date_type": "stem_validation_6_month",
+      "label": "STEM OPT 6-month validation report due",
+      "applies_to_statuses": ["f1_stem_opt"],
+      "default_offsets_days": [60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 7.4; A.3"
+    },
+    {
+      "date_type": "stem_validation_12_month",
+      "label": "STEM OPT 12-month validation report due",
+      "applies_to_statuses": ["f1_stem_opt"],
+      "default_offsets_days": [60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 7.4; A.3"
+    },
+    {
+      "date_type": "stem_validation_18_month",
+      "label": "STEM OPT 18-month validation report due",
+      "applies_to_statuses": ["f1_stem_opt"],
+      "default_offsets_days": [60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 7.4; A.3"
+    },
+    {
+      "date_type": "stem_validation_24_month",
+      "label": "STEM OPT 24-month validation report due",
+      "applies_to_statuses": ["f1_stem_opt"],
+      "default_offsets_days": [60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 7.4; A.3"
+    },
+    {
+      "date_type": "stem_material_change_report_10_day_deadline",
+      "label": "STEM OPT material change must be reported within 10 days",
+      "applies_to_statuses": ["f1_stem_opt"],
+      "default_offsets_days": [5, 3, 1, 0],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [5, 3, 1, 0] },
+        { "level": 2, "recipient": "hr", "at_offsets": [5, 3, 1, 0] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [1, 0] }
+      ],
+      "channels": ["email", "in_app", "slack"],
+      "spec_ref": "7.4; A.3"
+    },
+    {
+      "date_type": "employer_departure_report_5_day_deadline",
+      "label": "Employer must report STEM OPT employee departure to SEVP within 5 days",
+      "applies_to_statuses": ["f1_stem_opt"],
+      "default_offsets_days": [3, 2, 1, 0],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [3, 2, 1, 0] },
+        { "level": 2, "recipient": "hr", "at_offsets": [3, 2, 1, 0] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [1, 0] }
+      ],
+      "channels": ["email", "in_app", "slack"],
+      "spec_ref": "7.4; A.3; 8"
+    },
+    {
+      "date_type": "stem_ead_expiry",
+      "label": "STEM OPT EAD expiration",
+      "applies_to_statuses": ["f1_stem_opt"],
+      "default_offsets_days": [120, 90, 60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [120, 90, 60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [14, 7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 9; A.3"
+    },
+    {
+      "date_type": "stem_180_day_auto_extension_boundary",
+      "label": "STEM OPT 180-day auto-extension boundary (work authorization end while extension pending)",
+      "applies_to_statuses": ["f1_stem_opt"],
+      "default_offsets_days": [90, 60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [90, 60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [14, 7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 9; A.3"
+    },
+    {
+      "date_type": "cap_gap_april_1_cutoff",
+      "label": "Cap-gap April 1 cutoff (work authorization/status bridge end under the 2025 modernization rule)",
+      "applies_to_statuses": ["h1b_cap_gap", "f1_opt", "f1_stem_opt"],
+      "default_offsets_days": [90, 60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [90, 60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [14, 7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 7.4; A.4"
+    },
+    {
+      "date_type": "h1b_validity_expiry",
+      "label": "H-1B petition/status validity expiration",
+      "applies_to_statuses": ["h1b_active", "h1b_transfer_pending", "h1b_extension_pending", "h1b_amendment_pending"],
+      "default_offsets_days": [120, 90, 60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [120, 90, 60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [14, 7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 9; A.6"
+    },
+    {
+      "date_type": "h1b_extension_filing_window",
+      "label": "H-1B extension filing window opens (6 months before validity expiry)",
+      "applies_to_statuses": ["h1b_active", "i140_approved"],
+      "default_offsets_days": [30, 14, 7, 1, 0],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [30, 14, 7, 1, 0] },
+        { "level": 2, "recipient": "hr", "at_offsets": [30, 14, 7, 1, 0] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [7, 1, 0] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 9; A.6"
+    },
+    {
+      "date_type": "h1b_240_day_work_authorization_boundary",
+      "label": "240-day continued work authorization boundary while a timely H-1B extension is pending",
+      "applies_to_statuses": ["h1b_extension_pending"],
+      "default_offsets_days": [60, 30, 14, 7, 3, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [60, 30, 14, 7, 3, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [30, 14, 7, 3, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [7, 3, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "7.2; A.6"
+    },
+    {
+      "date_type": "h1b_registration_window_open",
+      "label": "H-1B cap registration window opens (annual March cycle)",
+      "applies_to_statuses": ["f1_opt", "f1_stem_opt"],
+      "default_offsets_days": [30, 14, 7, 1, 0],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [30, 14, 7, 1, 0] },
+        { "level": 2, "recipient": "hr", "at_offsets": [30, 14, 7, 1, 0] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [7, 1, 0] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "7.2; A.5"
+    },
+    {
+      "date_type": "h1b_petition_filing_deadline",
+      "label": "H-1B cap petition filing deadline (end of 90-day window after selection)",
+      "applies_to_statuses": ["f1_opt", "f1_stem_opt", "h1b_cap_gap"],
+      "default_offsets_days": [60, 30, 14, 7, 3, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [60, 30, 14, 7, 3, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [60, 30, 14, 7, 3, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [14, 7, 3, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "7.2; A.5"
+    },
+    {
+      "date_type": "h1b_start_date",
+      "label": "H-1B employment start date (October 1 or later per approval)",
+      "applies_to_statuses": ["h1b_cap_gap", "f1_opt", "f1_stem_opt"],
+      "default_offsets_days": [30, 14, 7, 1, 0],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [30, 14, 7, 1, 0] },
+        { "level": 2, "recipient": "hr", "at_offsets": [14, 7, 1, 0] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [1, 0] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "7.2; A.5"
+    },
+    {
+      "date_type": "ac21_one_year_i485_clock",
+      "label": "AC21 one-year-to-file-I-485 clock (priority date current; extensions barred if unfiled after 1 year)",
+      "applies_to_statuses": ["i140_approved"],
+      "default_offsets_days": [120, 90, 60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [120, 90, 60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [14, 7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 7.4; A.6"
+    },
+    {
+      "date_type": "ac21_365_day_marker",
+      "label": "AC21 106(a) 365-day marker (PERM/I-140 must be on file 365+ days before the 6th-year limit)",
+      "applies_to_statuses": ["h1b_active", "perm_filed"],
+      "default_offsets_days": [120, 90, 60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [120, 90, 60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [14, 7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "7.2; A.6"
+    },
+    {
+      "date_type": "i140_withdrawal_180_day_boundary",
+      "label": "I-140 180-day withdrawal boundary (withdrawal within 180 days of approval forfeits benefits)",
+      "applies_to_statuses": ["i140_approved"],
+      "default_offsets_days": [60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "7.4; A.6"
+    },
+    {
+      "date_type": "perm_validity_180_day",
+      "label": "PERM certification validity end (I-140 must be filed within 180 days)",
+      "applies_to_statuses": ["perm_approved"],
+      "default_offsets_days": [120, 90, 60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [120, 90, 60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [14, 7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 9; A.7"
+    },
+    {
+      "date_type": "priority_date_established",
+      "label": "Priority date established (PERM receipt date recorded)",
+      "applies_to_statuses": ["perm_filed"],
+      "default_offsets_days": [0],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [0] },
+        { "level": 2, "recipient": "hr", "at_offsets": [0] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [0] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "7.2; A.7"
+    },
+    {
+      "date_type": "priority_date_approaching_current",
+      "label": "Priority date approaching current on the controlling Visa Bulletin chart (within ~6 months)",
+      "applies_to_statuses": ["perm_approved", "i140_pending", "i140_approved", "i485_pending", "consular_pending"],
+      "default_offsets_days": [180, 120, 90, 60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [180, 120, 90, 60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [90, 60, 30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [30, 14, 7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 9; A.7"
+    },
+    {
+      "date_type": "ead_ap_renewal",
+      "label": "EAD/Advance Parole renewal due during pending I-485",
+      "applies_to_statuses": ["i485_pending"],
+      "default_offsets_days": [120, 90, 60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [120, 90, 60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [14, 7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 9; A.7"
+    },
+    {
+      "date_type": "i485_180_day_portability_boundary",
+      "label": "I-485 pending 180 days (AC21 106(c) same-or-similar portability becomes available with approved I-140)",
+      "applies_to_statuses": ["i485_pending"],
+      "default_offsets_days": [14, 7, 1, 0],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [14, 7, 1, 0] },
+        { "level": 2, "recipient": "hr", "at_offsets": [7, 1, 0] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [0] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "7.4; A.7"
+    },
+    {
+      "date_type": "consular_interview_date",
+      "label": "Consular immigrant-visa interview date",
+      "applies_to_statuses": ["consular_pending"],
+      "default_offsets_days": [30, 14, 7, 3, 1, 0],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [30, 14, 7, 3, 1, 0] },
+        { "level": 2, "recipient": "hr", "at_offsets": [14, 7, 3, 1, 0] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [3, 1, 0] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "7.2; A.7"
+    },
+    {
+      "date_type": "immigrant_visa_expiry",
+      "label": "Immigrant visa expiration (US admission required before expiry)",
+      "applies_to_statuses": ["consular_pending"],
+      "default_offsets_days": [90, 60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [90, 60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [14, 7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "7.2; A.7"
+    },
+    {
+      "date_type": "passport_expiry",
+      "label": "Passport expiration",
+      "applies_to_statuses": ["f1_studying", "f1_cpt", "f1_opt", "f1_stem_opt", "h1b_active", "h1b_cap_gap", "h1b_transfer_pending", "h1b_extension_pending", "h1b_amendment_pending", "perm_filed", "perm_approved", "i140_pending", "i140_approved", "i485_pending", "consular_pending", "l1", "o1", "tn"],
+      "default_offsets_days": [180, 120, 90, 60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [180, 120, 90, 60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [90, 60, 30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [30, 14, 7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 9"
+    },
+    {
+      "date_type": "i9_section2_deadline",
+      "label": "I-9 Section 2 completion deadline (within 3 business days of start; day one if employment under 3 days)",
+      "applies_to_statuses": ["us_citizen", "permanent_resident", "f1_cpt", "f1_opt", "f1_stem_opt", "h1b_active", "h1b_cap_gap", "h1b_transfer_pending", "h1b_extension_pending", "h1b_amendment_pending", "i485_pending", "l1", "o1", "tn"],
+      "default_offsets_days": [3, 2, 1, 0],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [3, 2, 1, 0] },
+        { "level": 2, "recipient": "hr", "at_offsets": [3, 2, 1, 0] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [0] }
+      ],
+      "channels": ["email", "in_app", "slack"],
+      "spec_ref": "Appendix B; 8; A.8"
+    },
+    {
+      "date_type": "everify_case_deadline",
+      "label": "E-Verify case creation deadline (within 3 business days of hire)",
+      "applies_to_statuses": ["us_citizen", "permanent_resident", "f1_cpt", "f1_opt", "f1_stem_opt", "h1b_active", "h1b_cap_gap", "h1b_transfer_pending", "h1b_extension_pending", "h1b_amendment_pending", "i485_pending", "l1", "o1", "tn"],
+      "default_offsets_days": [3, 2, 1, 0],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [3, 2, 1, 0] },
+        { "level": 2, "recipient": "hr", "at_offsets": [3, 2, 1, 0] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [0] }
+      ],
+      "channels": ["email", "in_app", "slack"],
+      "spec_ref": "Appendix B; 8; A.8"
+    },
+    {
+      "date_type": "i9_reverification_due",
+      "label": "I-9 reverification due (work-authorization document expiring)",
+      "applies_to_statuses": ["f1_cpt", "f1_opt", "f1_stem_opt", "h1b_active", "h1b_cap_gap", "h1b_transfer_pending", "h1b_extension_pending", "h1b_amendment_pending", "i485_pending", "l1", "o1", "tn"],
+      "default_offsets_days": [30, 14, 7, 3, 1, 0],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [30, 14, 7, 3, 1, 0] },
+        { "level": 2, "recipient": "hr", "at_offsets": [30, 14, 7, 3, 1, 0] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [3, 1, 0] }
+      ],
+      "channels": ["email", "in_app", "slack"],
+      "spec_ref": "8; A.8"
+    },
+    {
+      "date_type": "rfe_response_deadline",
+      "label": "RFE response deadline",
+      "applies_to_statuses": ["f1_studying", "f1_cpt", "f1_opt", "f1_stem_opt", "h1b_cap_gap", "h1b_transfer_pending", "h1b_extension_pending", "h1b_amendment_pending", "i140_pending", "i485_pending"],
+      "default_offsets_days": [60, 30, 14, 7, 3, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [60, 30, 14, 7, 3, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [60, 30, 14, 7, 3, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [30, 14, 7, 3, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "Appendix B; 7.4; 9"
+    },
+    {
+      "date_type": "h1b_grace_period_end",
+      "label": "H-1B 60-day grace period end after termination (offboarding starts the clock; offset 60 is the clock-start notice)",
+      "applies_to_statuses": ["h1b_active"],
+      "default_offsets_days": [60, 45, 30, 14, 7, 3, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [60, 45, 30, 14, 7, 3, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [60, 45, 30, 14, 7, 3, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [60, 30, 14, 7, 3, 1] }
+      ],
+      "channels": ["email", "in_app", "slack"],
+      "spec_ref": "Appendix B; 8; 7.4"
+    },
+    {
+      "date_type": "opt_grace_period_end",
+      "label": "F-1 60-day grace period end after OPT/STEM EAD expiry (status only, no work authorization)",
+      "applies_to_statuses": ["f1_opt", "f1_stem_opt"],
+      "default_offsets_days": [60, 45, 30, 14, 7, 3, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [60, 45, 30, 14, 7, 3, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [60, 45, 30, 14, 7, 3, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [60, 30, 14, 7, 3, 1] }
+      ],
+      "channels": ["email", "in_app", "slack"],
+      "spec_ref": "Appendix B; 8; 7.4; A.2"
+    },
+    {
+      "date_type": "program_end_date",
+      "label": "F-1 academic program end date (anchors the OPT application window)",
+      "applies_to_statuses": ["f1_studying", "f1_cpt"],
+      "default_offsets_days": [120, 90, 60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [120, 90, 60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [14, 7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "7.2; A.2"
+    },
+    {
+      "date_type": "opt_application_window_open",
+      "label": "OPT application window opens (90 days before program end)",
+      "applies_to_statuses": ["f1_studying", "f1_cpt"],
+      "default_offsets_days": [30, 14, 7, 1, 0],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [30, 14, 7, 1, 0] },
+        { "level": 2, "recipient": "hr", "at_offsets": [14, 7, 1, 0] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [1, 0] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "7.2; A.2"
+    },
+    {
+      "date_type": "cpt_end_date",
+      "label": "CPT authorization end date (per I-20 endorsement)",
+      "applies_to_statuses": ["f1_cpt"],
+      "default_offsets_days": [60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "7.2; A.1"
+    },
+    {
+      "date_type": "cumulative_full_time_cpt_months",
+      "label": "Cumulative full-time CPT approaching the 12-month OPT-eligibility bar (projected bar date)",
+      "applies_to_statuses": ["f1_cpt"],
+      "default_offsets_days": [90, 60, 30, 14, 7, 1],
+      "escalation": [
+        { "level": 1, "recipient": "employee", "at_offsets": [90, 60, 30, 14, 7, 1] },
+        { "level": 2, "recipient": "hr", "at_offsets": [60, 30, 14, 7, 1] },
+        { "level": 3, "recipient": "counsel", "at_offsets": [14, 7, 1] }
+      ],
+      "channels": ["email", "in_app"],
+      "spec_ref": "7.2; A.1"
+    }
+  ]
+}

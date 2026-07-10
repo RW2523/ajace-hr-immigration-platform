@@ -1,0 +1,29 @@
+{
+  "name": "@hr/mcp-rules-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "start": "tsx src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hr/shared": "workspace:*",
+    "@hr/db": "workspace:*",
+    "@hr/rules-engine": "workspace:*",
+    "@hr/mcp-shared": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "postgres": "^3.4.5",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

@@ -1,0 +1,20 @@
+node_modules/
+dist/
+.next/
+.turbo/
+coverage/
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+.DS_Store
+*.log
+
+# Runtime-downloaded OCR model (fetched to tmp at runtime)
+*.traineddata
+
+# Scratch/intermediate seed SQL (canonical source is data/immigration-seed/*.json)
+scratch-seed/
+
+# Requires a token with `workflow` scope to push; add via GitHub UI or `gh auth refresh -s workflow`
+.github/workflows/ci.yml

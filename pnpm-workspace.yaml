@@ -1,0 +1,8 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "mcp/*"
+allowBuilds:
+  esbuild: true
+  sharp: true
+  tesseract.js: true
