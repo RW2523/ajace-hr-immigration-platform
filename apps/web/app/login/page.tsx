@@ -1,11 +1,21 @@
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import { Scale, ShieldCheck, Sparkles, CalendarClock } from 'lucide-react';
 import { supabaseServer } from '@/lib/supabase/server';
+import { rateLimit } from '@/lib/rate-limit';
 
 async function signIn(formData: FormData) {
   'use server';
-  const email = String(formData.get('email') ?? '');
-  const password = String(formData.get('password') ?? '');
+  // Brute-force guard: cap sign-in attempts per client IP (layered on top of
+  // Supabase Auth's own rate limiting).
+  const h = await headers();
+  const ip = (h.get('x-forwarded-for')?.split(',')[0] ?? h.get('x-real-ip') ?? 'unknown').trim();
+  if (!rateLimit(`login:${ip}`, 10, 5 * 60_000).ok) {
+    redirect(`/login?error=${encodeURIComponent('Too many attempts. Please wait a few minutes and try again.')}`);
+  }
+  const email = String(formData.get('email') ?? '').slice(0, 320);
+  const password = String(formData.get('password') ?? '').slice(0, 200);
+  if (!email || !password) redirect(`/login?error=${encodeURIComponent('Email and password are required.')}`);
   const supabase = await supabaseServer();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) redirect(`/login?error=${encodeURIComponent(error.message)}`);

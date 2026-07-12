@@ -4,18 +4,33 @@
  * in the `x-assistant-meta` header (base64 UTF-8 JSON) before the body streams.
  */
 import { getPrincipal, db } from '@/lib/session';
+import { rateLimit } from '@/lib/rate-limit';
 import { runAgentStream } from '@hr/rag';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+const MAX_QUESTION_LEN = 4000;
+
 export async function POST(req: Request) {
   const principal = await getPrincipal();
   if (!principal) return new Response('Unauthorized', { status: 401 });
 
-  let question = '';
-  try { question = String((await req.json()).question ?? ''); } catch { /* empty */ }
-  if (!question.trim()) return new Response('Bad request', { status: 400 });
+  // Rate limit per authenticated user: the assistant makes paid LLM calls, so this
+  // caps runaway cost/abuse (20 questions / minute per user).
+  const rl = rateLimit(`assistant:${principal.userId}`, 20, 60_000);
+  if (!rl.ok) {
+    return new Response('Too many requests. Please slow down.', {
+      status: 429,
+      headers: { 'retry-after': String(rl.resetInSeconds) },
+    });
+  }
+
+  let raw: unknown;
+  try { raw = (await req.json())?.question; } catch { return new Response('Bad request', { status: 400 }); }
+  if (typeof raw !== 'string') return new Response('Bad request', { status: 400 });
+  const question = raw.trim().slice(0, MAX_QUESTION_LEN);
+  if (!question) return new Response('Bad request', { status: 400 });
 
   const { meta, stream } = await runAgentStream({ sql: db() }, principal, question);
   const metaB64 = Buffer.from(JSON.stringify(meta), 'utf8').toString('base64');

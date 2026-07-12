@@ -7,19 +7,28 @@
  * this automatically) or an `x-cron-secret` header. If CRON_SECRET is unset the
  * route refuses to run (fail closed). Runs on the Node runtime (postgres driver).
  */
+import { timingSafeEqual } from 'node:crypto';
 import { serviceClient } from '@hr/db';
 import { runScan } from '@hr/notifications';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+/** Constant-time string compare to avoid leaking the secret via timing. */
+function safeEqual(a: string | null | undefined, b: string): boolean {
+  if (!a) return false;
+  const ab = Buffer.from(a);
+  const bb = Buffer.from(b);
+  if (ab.length !== bb.length) return false;
+  return timingSafeEqual(ab, bb);
+}
+
 function authorize(req: Request): boolean {
   const secret = process.env.CRON_SECRET;
   if (!secret) return false; // fail closed: never run unguarded
   const auth = req.headers.get('authorization');
   const bearer = auth?.startsWith('Bearer ') ? auth.slice(7) : null;
-  const header = req.headers.get('x-cron-secret');
-  return bearer === secret || header === secret;
+  return safeEqual(bearer, secret) || safeEqual(req.headers.get('x-cron-secret'), secret);
 }
 
 async function handle(req: Request): Promise<Response> {

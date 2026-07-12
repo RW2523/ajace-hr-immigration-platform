@@ -35,8 +35,14 @@ async function upload(formData: FormData) {
   const principal = await getPrincipal();
   if (!principal) return;
   const file = formData.get('file') as File | null;
-  const documentType = String(formData.get('document_type') ?? 'other');
+  const documentType = String(formData.get('document_type') ?? 'other').slice(0, 64);
   if (!file || file.size === 0) return;
+  // Reject oversized or unexpected file types before touching storage (defense in
+  // depth on top of the 5MB server-action body limit).
+  const MAX_BYTES = 15 * 1024 * 1024;
+  const ALLOWED = /^(application\/pdf|image\/(png|jpe?g|gif|webp|tiff?|heic)|text\/plain)$/i;
+  if (file.size > MAX_BYTES) return;
+  if (file.type && !ALLOWED.test(file.type)) return;
   const sql = db();
   const [emp] = await sql<{ id: string; org_id: string; user_id: string | null }[]>`
     select id, org_id, user_id from app.employees where user_id = ${principal.userId}`;
