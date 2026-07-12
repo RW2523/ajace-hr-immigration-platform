@@ -1,14 +1,19 @@
 import postgres from 'postgres';
+import { createSql, resolveDatabaseUrl } from './connect.js';
 
+export { createSql, resolveDatabaseUrl } from './connect.js';
+
+/** Back-compat: connection string for tooling. Resolution/validation for real
+ *  connections happens lazily in createSql() (which throws in prod if unset). */
 export const DATABASE_URL =
   process.env.DATABASE_URL ?? 'postgres://postgres:postgres@localhost:54329/hr';
 
 /**
  * A privileged connection (migrations, seed, trusted server jobs). Connects as
- * the DB owner / service_role, which bypasses RLS.
+ * the DB owner / service_role, which bypasses RLS. Serverless-/pooler-safe.
  */
 export function serviceClient() {
-  return postgres(DATABASE_URL, { max: 4, onnotice: () => {} });
+  return createSql();
 }
 
 /**

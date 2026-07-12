@@ -8,13 +8,17 @@
  * client never supplies a scope or role.
  */
 import 'server-only';
-import postgres from 'postgres';
+import type postgres from 'postgres';
 import type { Permission, Principal } from '@hr/shared';
+import { createSql } from '@hr/db';
 import { supabaseServer } from './supabase/server';
 
 let _sql: postgres.Sql | null = null;
 export function db(): postgres.Sql {
-  if (!_sql) _sql = postgres(process.env.DATABASE_URL ?? 'postgres://postgres:postgres@localhost:54329/hr', { max: 8 });
+  // Serverless-/pooler-safe (see @hr/db createSql): small pool + no prepared
+  // statements when talking to Supabase's transaction pooler. Requires
+  // DATABASE_URL in production.
+  if (!_sql) _sql = createSql();
   return _sql;
 }
 
