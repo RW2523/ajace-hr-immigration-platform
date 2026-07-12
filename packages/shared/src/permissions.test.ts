@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   decide,
   effectiveScope,
+  hasStaffScope,
   requirePermission,
   AuthorizationError,
   type Principal,
@@ -103,6 +104,46 @@ describe('effectiveScope (row-filter resolution)', () => {
 
   it('returns null when the principal holds no grant', () => {
     expect(effectiveScope(principalFor('employee'), 'audit_log', 'read')).toBeNull();
+  });
+});
+
+describe('write-path IDOR guard (requireContext)', () => {
+  // Regression for the confirmed IDOR: a mutation that called requirePermission
+  // with NO context used to pass for any non-global scope. requireContext closes it.
+  it('an org-scoped mutation with NO context is DENIED when requireContext is set', () => {
+    const employer = principalFor('employer', { orgId: 'org-1' });
+    // Without requireContext, the legacy behavior granted (this is the bug):
+    expect(decide(employer, { resource: 'hr_items', action: 'update' }).allowed).toBe(true);
+    // With requireContext, a context-less instance mutation is denied:
+    expect(decide(employer, { resource: 'hr_items', action: 'update', requireContext: true }).allowed).toBe(false);
+  });
+
+  it('an assigned-scope (HR) mutation requires the row to be in the assigned set', () => {
+    const hr = principalFor('hr', { userId: 'hr1', assignedEmployeeIds: ['emp-A'] });
+    // Cross-employee row → denied even with the grant.
+    expect(decide(hr, { resource: 'hr_items', action: 'update', requireContext: true, context: { employeeId: 'emp-B', orgId: 'org-1' } }).allowed).toBe(false);
+    // Own assigned employee → allowed.
+    expect(decide(hr, { resource: 'hr_items', action: 'update', requireContext: true, context: { employeeId: 'emp-A', orgId: 'org-1' } }).allowed).toBe(true);
+  });
+
+  it('an org-scoped mutation is denied for a row in a DIFFERENT org', () => {
+    const employer = principalFor('employer', { orgId: 'org-1' });
+    expect(decide(employer, { resource: 'hr_items', action: 'update', requireContext: true, context: { orgId: 'org-2' } }).allowed).toBe(false);
+    expect(decide(employer, { resource: 'hr_items', action: 'update', requireContext: true, context: { orgId: 'org-1' } }).allowed).toBe(true);
+  });
+
+  it('collection reads (no requireContext) still pass for staff row-filtering', () => {
+    const hr = principalFor('hr', { assignedEmployeeIds: ['emp-A'] });
+    expect(decide(hr, { resource: 'hr_items', action: 'read' }).allowed).toBe(true);
+  });
+});
+
+describe('hasStaffScope (replaces role-key authz)', () => {
+  it('is false for an employee and true for HR/employer/admin', () => {
+    expect(hasStaffScope(principalFor('employee'), 'hr_items', 'update')).toBe(false);
+    expect(hasStaffScope(principalFor('hr'), 'hr_items', 'update')).toBe(true);
+    expect(hasStaffScope(principalFor('employer'), 'helpdesk', 'update')).toBe(true);
+    expect(hasStaffScope(principalFor('admin'), 'helpdesk', 'update')).toBe(true);
   });
 });
 

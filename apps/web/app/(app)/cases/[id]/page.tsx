@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { getPrincipal, db } from '@/lib/session';
 import { requirePermission } from '@hr/shared';
-import { loadRuleData, validateCase, type CaseSnapshot } from '@hr/rules-engine';
+import { loadRuleData, validateCase } from '@hr/rules-engine';
+import { buildCaseSnapshot } from '@hr/workflow';
 import { Card, Pill } from '@/components/ui';
 import { CounselPendingBadge } from '@/components/CounselPendingBadge';
-import { ArrowRight, CalendarClock, GitBranch, AlertTriangle, CheckCircle2, Check, FileText } from 'lucide-react';
+import { ArrowRight, CalendarClock, GitBranch, AlertTriangle, CheckCircle2, Check, FileText, Scale } from 'lucide-react';
 
 const TRACKS: Record<string, string[]> = {
   f1: ['f1_studying', 'f1_opt', 'f1_stem_opt', 'h1b_active', 'perm_filed', 'i140_approved', 'i485_pending', 'permanent_resident'],
@@ -29,9 +30,9 @@ export default async function CasePage({ params }: { params: Promise<{ id: strin
   const asOf = new Date().toISOString().slice(0, 10);
   const data = await loadRuleData(sql);
   const dateRows = await sql<{ date_type: string; value: string }[]>`select date_type, to_char(value,'YYYY-MM-DD') as value from app.case_dates where case_id = ${id} order by value`;
-  const dates: Record<string, string> = {};
-  for (const r of dateRows) dates[r.date_type] = r.value;
-  const snapshot: CaseSnapshot = { currentStatus: c.current_status, dates, collectedDocuments: [], attributes: {} };
+  // Use the ONE canonical snapshot builder (real collected documents + computed
+  // unemployment) so this page and the MCP tools never disagree on eligibility.
+  const { snapshot } = await buildCaseSnapshot(sql, id, asOf);
   const result = validateCase(data, snapshot, asOf);
 
   const path = TRACKS[c.track] ?? [c.current_status];
@@ -81,11 +82,33 @@ export default async function CasePage({ params }: { params: Promise<{ id: strin
           )}
         </Card>
 
+        <Card title="Pending counsel review" icon={<Scale size={18} />} sub="Steps the engine cannot confirm without legal judgment">
+          {result.needsCounselReviewTransitions.length === 0 ? (
+            <div className="muted" style={{ fontSize: 13 }}>Nothing awaiting counsel review.</div>
+          ) : (
+            <div style={{ display: 'grid', gap: 10 }}>
+              {result.needsCounselReviewTransitions.map((t) => (
+                <div key={t.transitionKey} style={{ padding: '11px 13px', background: 'var(--warn-bg)', border: '1px solid var(--warn-bd)', borderRadius: 'var(--r-sm)' }}>
+                  <div className="between">
+                    <div className="row"><Scale size={15} color="var(--warn)" /><span style={{ fontWeight: 650 }}>{short(t.toStatus)}</span></div>
+                    <Pill tone="warn">counsel review</Pill>
+                  </div>
+                  {t.unconfirmedPreconditions.length > 0 && (
+                    <ul style={{ margin: '8px 0 0', paddingLeft: 18, fontSize: 12.5, color: 'var(--ink-2)' }}>
+                      {t.unconfirmedPreconditions.map((p, i) => <li key={i}>{p}</li>)}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+
         <Card title="Tracked deadlines" icon={<CalendarClock size={18} />}>
           {dateRows.length === 0 ? <div className="muted" style={{ fontSize: 13 }}>No dates on file yet.</div> : (
             <div className="timeline">
-              {dateRows.map((d) => (
-                <div className="tl-item" key={d.date_type}>
+              {dateRows.map((d, i) => (
+                <div className="tl-item" key={`${d.date_type}-${d.value}-${i}`}>
                   <span className="tl-dot" />
                   <div className="tl-date">{d.value}</div>
                   <div className="tl-label">{d.date_type.replace(/_/g, ' ')}</div>

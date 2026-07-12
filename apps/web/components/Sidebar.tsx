@@ -6,7 +6,7 @@ import {
   LayoutDashboard, FolderOpen, UserRound, FileText, Sparkles, Users,
   Scale, ScrollText, ChevronsLeft, ChevronsRight, LogOut,
   ClipboardList, CalendarDays, HeartPulse, GraduationCap, Star, BookCheck,
-  LifeBuoy, FileSignature, BadgeCheck, UserMinus,
+  LifeBuoy, FileSignature, BadgeCheck, UserMinus, ShieldCheck,
 } from 'lucide-react';
 
 interface NavItem { href: string; label: string; icon: React.ReactNode; }
@@ -34,6 +34,7 @@ export function Sidebar({
     { href: '/profile', label: 'My Profile', icon: <UserRound size={18} /> },
     { href: '/documents', label: 'Documents', icon: <FileText size={18} /> },
     { href: '/assistant', label: 'Assistant', icon: <Sparkles size={18} /> },
+    { href: '/security', label: 'Security', icon: <ShieldCheck size={18} /> },
   ];
   const hr: NavItem[] = [
     { href: '/hr/onboarding', label: 'Onboarding', icon: <ClipboardList size={18} /> },

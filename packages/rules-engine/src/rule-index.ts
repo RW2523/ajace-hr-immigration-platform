@@ -3,10 +3,15 @@
  * rule rows, and carries provenance so callers can surface the §14
  * "as-of / confirmed-by-counsel" indicator. Never hard-codes an immigration value.
  *
- * "Active" = not superseded (`superseded_by is null`) and, among candidates,
- * the one with the latest `effective_date` that is not in the future relative to
- * the evaluation date. This lets a case filed under an old rule be evaluated
- * against the rule in force at its filing date by passing that date as `asOf`.
+ * As-of semantics: among the rows whose `effective_date <= asOf` (a null
+ * effective_date is treated as always-effective), the one with the LATEST
+ * `effective_date` wins. Supersession is expressed structurally by a newer
+ * effective-dated row, so we do NOT pre-filter on `superseded_by` — doing that
+ * would drop the row that was actually in force at a historical `asOf` (the one
+ * now marked superseded), and would also let a future-dated successor be applied
+ * early. A row whose effective_date is in the future relative to `asOf` is never
+ * applied. This lets a case filed under an old rule be evaluated against the rule
+ * in force at its filing date by passing that date as `asOf`.
  */
 import type { RuleRow } from '@hr/shared';
 import type { ResolvedRule, RuleProvenance } from './types.js';
@@ -28,15 +33,17 @@ export class RuleIndex {
     const rows = this.byKey.get(`${key}::${attribute}`);
     if (!rows || rows.length === 0) return null;
 
-    const candidates = rows
-      .filter((r) => r.superseded_by === null)
-      .filter((r) => !r.effective_date || r.effective_date <= asOf);
+    // In force at `asOf` = effective on/before asOf (null = always-effective).
+    // Supersession is captured by effective_date ordering, NOT pre-filtered here,
+    // so historical `asOf` resolves to the row actually in force then (§7.5, Bug 4).
+    const inForce = rows.filter((r) => !r.effective_date || r.effective_date <= asOf);
+    if (inForce.length === 0) return null; // every candidate is future-dated
 
-    const pool = candidates.length > 0 ? candidates : rows.filter((r) => r.superseded_by === null);
-    if (pool.length === 0) return null;
-
-    // Latest effective_date wins; nulls sort last.
-    pool.sort((a, b) => (b.effective_date ?? '0000-00-00').localeCompare(a.effective_date ?? '0000-00-00'));
+    // Latest effective_date wins; a null effective_date sorts earliest (a dated
+    // row supersedes an undated baseline), and only wins if it is the sole option.
+    const pool = [...inForce].sort((a, b) =>
+      (b.effective_date ?? '0000-00-00').localeCompare(a.effective_date ?? '0000-00-00'),
+    );
     const row = pool[0]!;
     return { value: row.value as T, valueType: row.value_type, provenance: provenanceOf(row) };
   }

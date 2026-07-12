@@ -35,7 +35,12 @@ export interface DueReminder {
   escalationLevel: number;
   recipientRole: 'employee' | 'hr' | 'counsel' | string;
   channels: string[];
-  /** Stable idempotency key — one send per (case, date_type, offset, level). */
+  /**
+   * Stable idempotency key — one send per (case, date_type, TARGET DATE, offset, level).
+   * The target date is part of the key so that when a deadline is corrected or renewed
+   * (e.g. an EAD reissued with a new expiry) a fresh reminder series fires, while the
+   * SAME date never re-notifies across scans.
+   */
   dedupeKey: string;
 }
 
@@ -48,8 +53,16 @@ export interface ScanOptions {
 
 const DEFAULT_OPTS: ScanOptions = { maxOverdueDays: 30 };
 
-export function dedupeKey(caseId: string, dateType: string, offset: number, level: number): string {
-  return `${caseId}:${dateType}:o${offset}:l${level}`;
+export function dedupeKey(
+  caseId: string,
+  dateType: string,
+  targetDate: string,
+  offset: number,
+  level: number,
+): string {
+  // Target date is embedded so a changed/renewed date produces a NEW key (new series),
+  // while an unchanged date collides and is suppressed (idempotent).
+  return `${caseId}:${dateType}:d${targetDate}:o${offset}:l${level}`;
 }
 
 /**
@@ -82,7 +95,7 @@ export function computeDueReminders(
       // Which escalation tiers include this offset?
       for (const tier of trigger.escalation) {
         if (!tier.at_offsets.includes(offset)) continue;
-        const key = dedupeKey(d.caseId, d.dateType, offset, tier.level);
+        const key = dedupeKey(d.caseId, d.dateType, d.targetDate, offset, tier.level);
         if (alreadySent.has(key)) continue;
         due.push({
           caseId: d.caseId,

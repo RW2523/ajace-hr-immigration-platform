@@ -66,6 +66,12 @@ export async function rulesValidate(sql: postgres.Sql, input: z.infer<typeof rul
     as_of: asOf,
     counsel_pending: result.anyCounselPending,
     eligible: result.eligibleTransitions.map((t) => t.toStatus),
+    // Blocked only by unconfirmable legal preconditions — surfaced separately so
+    // callers never treat these as eligible (Bug 1).
+    needs_counsel_review: result.needsCounselReviewTransitions.map((t) => ({
+      to: t.toStatus,
+      unconfirmed_preconditions: t.unconfirmedPreconditions,
+    })),
     findings: result.findings,
   };
 }

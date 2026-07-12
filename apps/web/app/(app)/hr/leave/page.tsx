@@ -1,8 +1,8 @@
 import { revalidatePath } from 'next/cache';
 import { CalendarDays, Check, X, Plus } from 'lucide-react';
-import { getPrincipal, primaryRole, db } from '@/lib/session';
+import { getPrincipal, db } from '@/lib/session';
 import { myEmployee, scopedEmployeeIds } from '@/lib/data';
-import { requirePermission } from '@hr/shared';
+import { requirePermission, hasStaffScope } from '@hr/shared';
 import { Card, Pill, StatCard, EmptyState } from '@/components/ui';
 
 async function requestLeave(formData: FormData) {
@@ -22,18 +22,29 @@ async function decide(formData: FormData) {
   'use server';
   const principal = await getPrincipal();
   if (!principal) return;
-  requirePermission(principal, { resource: 'hr_items', action: 'update' });
   const id = String(formData.get('id'));
   const status = String(formData.get('status'));
+  if (status !== 'approved' && status !== 'denied') return;
   const sql = db();
-  await sql`update app.leave_requests set status = ${status}, approver_user_id = ${principal.userId}, updated_at = now() where id = ${id}`;
+  // Load the target row FIRST so authorization is against the real owner/org,
+  // not a client-supplied id — then constrain the write to that org.
+  const [row] = await sql<{ org_id: string; employee_id: string; user_id: string | null }[]>`
+    select l.org_id, l.employee_id, e.user_id
+    from app.leave_requests l join app.employees e on e.id = l.employee_id
+    where l.id = ${id}`;
+  if (!row) return;
+  requirePermission(principal, {
+    resource: 'hr_items', action: 'update', requireContext: true,
+    context: { orgId: row.org_id, employeeId: row.employee_id, ownerUserId: row.user_id ?? undefined },
+  });
+  await sql`update app.leave_requests set status = ${status}, approver_user_id = ${principal.userId}, updated_at = now()
+            where id = ${id} and org_id = ${row.org_id}`;
   revalidatePath('/hr/leave');
 }
 
 export default async function LeavePage() {
   const principal = (await getPrincipal())!;
-  const role = primaryRole(principal);
-  const isStaff = role !== 'employee';
+  const isStaff = hasStaffScope(principal, 'hr_items', 'update');
   const sql = db();
   const ids = await scopedEmployeeIds(principal);
   const rows = ids.length

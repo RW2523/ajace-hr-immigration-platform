@@ -9,6 +9,10 @@ async function signIn(formData: FormData) {
   const supabase = await supabaseServer();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) redirect(`/login?error=${encodeURIComponent(error.message)}`);
+  // If the account has verified MFA, the password step only reaches aal1; require
+  // a one-time code to step up to aal2 before entering the workspace.
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aal?.nextLevel === 'aal2' && aal.nextLevel !== aal.currentLevel) redirect('/login/mfa');
   redirect('/dashboard');
 }
 
@@ -62,6 +66,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             </div>
             <button type="submit" className="btn btn-primary" style={{ padding: '11px 16px', marginTop: 4 }}>Sign in</button>
           </form>
+          {process.env.NEXT_PUBLIC_SHOW_DEMO_ACCOUNTS === '1' && (
           <details style={{ marginTop: 20 }}>
             <summary style={{ cursor: 'pointer', color: 'var(--muted)', fontSize: 12.5, fontWeight: 600 }}>Demo accounts — AJACE Inc</summary>
             <div style={{ fontSize: 12.5, color: 'var(--muted)', marginTop: 10, lineHeight: 1.85 }}>
@@ -78,6 +83,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
               <div style={{ marginTop: 10, paddingTop: 8, borderTop: '1px solid var(--border-2)' }}>Password for all: <code>Ajace@2026</code></div>
             </div>
           </details>
+          )}
         </div>
       </div>
     </div>

@@ -72,10 +72,18 @@ export async function caseCheckEligibility(
     as_of: asOf,
     counsel_pending: result.anyCounselPending,
     eligible_transitions: result.eligibleTransitions.map((t) => ({ to: t.toStatus, key: t.transitionKey })),
+    // Blocked only by preconditions the engine cannot confirm — render as "pending
+    // counsel review", never as a green "eligible" (Bug 1).
+    needs_counsel_review_transitions: result.needsCounselReviewTransitions.map((t) => ({
+      to: t.toStatus,
+      key: t.transitionKey,
+      unconfirmed_preconditions: t.unconfirmedPreconditions,
+    })),
     ineligible_transitions: result.ineligibleTransitions.map((t) => ({
       to: t.toStatus,
       missing_documents: t.missingDocuments,
       unmet_preconditions: t.unmetPreconditions,
+      unconfirmed_preconditions: t.unconfirmedPreconditions,
     })),
     findings: result.findings.map((f) => ({ code: f.code, severity: f.severity, message: f.message, counsel_pending: f.counselPending })),
   };

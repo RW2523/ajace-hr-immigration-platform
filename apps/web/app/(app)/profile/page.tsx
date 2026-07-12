@@ -2,13 +2,15 @@ import {
   UserRound, ShieldCheck, Plane, BookOpen, GraduationCap, Mail, MapPin, Building2,
 } from 'lucide-react';
 import { getPrincipal, db } from '@/lib/session';
+import { PgAuditSink, readSecureIds } from '@hr/hr';
 import { Card, Field, Pill } from '@/components/ui';
 
+// Sensitive immigration identifiers (passport/SEVIS/A-number) are NO LONGER in this
+// plaintext blob — they live app-layer-encrypted in employee_secure_ids and are read
+// via the audited PII service below (§12).
 interface Profile {
   date_of_birth?: string; gender?: string; marital_status?: string;
   city_of_birth?: string; province_of_birth?: string; country_of_birth?: string; country_of_citizenship?: string;
-  alien_registration_number?: string | null; sevis_number?: string;
-  passport_number?: string; passport_country?: string; passport_issue?: string; passport_expiry?: string;
   education?: { degree: string; school: string; graduated: string; address?: string }[];
   email?: string; phone?: string;
   us_address?: { street?: string; city?: string; state?: string; zip?: string };
@@ -31,6 +33,8 @@ export default async function ProfilePage() {
     );
   }
   const p = emp.profile ?? {};
+  // Owner-audited decryption of sensitive identifiers (logs a sensitive_pii.read event).
+  const secure = await readSecureIds(sql, new PgAuditSink(sql), principal, emp.id).catch(() => null);
   const [caseRow] = await sql<{ current_status: string; country_of_birth: string | null }[]>`
     select current_status, country_of_birth from app.immigration_cases where employee_id = ${emp.id} order by opened_at desc limit 1`;
 
@@ -55,7 +59,7 @@ export default async function ProfilePage() {
           <Field label="Country of birth" value={p.country_of_birth ?? caseRow?.country_of_birth} />
           <Field label="Country of citizenship" value={p.country_of_citizenship} />
           <Field label="Social Security Number" value="•••-••-0917" mono />
-          <Field label="Alien registration number" value={p.alien_registration_number ?? 'None'} />
+          <Field label="Alien registration number" value={secure?.alien_registration_number ?? 'None'} />
         </div>
       </Card>
 
@@ -63,7 +67,7 @@ export default async function ProfilePage() {
         <div className="fgrid">
           <Field label="Current status" value={caseRow ? <Pill tone="brand">{caseRow.current_status.replace(/_/g, ' ')}</Pill> : '—'} />
           <Field label="Employment type" value={emp.employment_type.replace('_', ' ')} />
-          <Field label="SEVIS number" value={p.sevis_number} copy={p.sevis_number} mono />
+          <Field label="SEVIS number" value={secure?.sevis_number} copy={secure?.sevis_number} mono />
           <Field label="Hire date" value={emp.hire_date} />
         </div>
       </Card>
@@ -77,10 +81,10 @@ export default async function ProfilePage() {
 
       <Card title="Current Passport" icon={<BookOpen size={18} />}>
         <div className="fgrid">
-          <Field label="Passport number" value={p.passport_number} copy={p.passport_number} mono />
-          <Field label="Country of issuance" value={p.passport_country} />
-          <Field label="Issue date" value={p.passport_issue} />
-          <Field label="Expiration date" value={p.passport_expiry} />
+          <Field label="Passport number" value={secure?.passport_number} copy={secure?.passport_number} mono />
+          <Field label="Country of issuance" value={secure?.passport_country} />
+          <Field label="Issue date" value={secure?.passport_issue} />
+          <Field label="Expiration date" value={secure?.passport_expiry} />
         </div>
       </Card>
 

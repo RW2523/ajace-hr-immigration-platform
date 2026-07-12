@@ -4,8 +4,8 @@ import { redirect } from 'next/navigation';
 import {
   LifeBuoy, ArrowLeft, Send, UserCheck, Lock, CheckCircle2, Clock, MessageSquare,
 } from 'lucide-react';
-import { getPrincipal, primaryRole, db } from '@/lib/session';
-import { requirePermission, type Principal } from '@hr/shared';
+import { getPrincipal, db } from '@/lib/session';
+import { requirePermission, hasStaffScope, type Principal } from '@hr/shared';
 import { Card, Pill } from '@/components/ui';
 
 const PRIO_TONE: Record<string, 'neutral' | 'warn' | 'danger' | 'brand'> = { low: 'neutral', normal: 'brand', high: 'warn', urgent: 'danger' };
@@ -20,7 +20,7 @@ async function loadTicket(principal: Principal, id: string) {
     from app.helpdesk_tickets t left join app.users u on u.id = t.opened_by left join app.users a on a.id = t.assignee_user_id
     where t.id = ${id}`;
   if (!t) return null;
-  const isStaff = primaryRole(principal) !== 'employee';
+  const isStaff = hasStaffScope(principal, 'helpdesk', 'update');
   const ok = t.opened_by === principal.userId || (isStaff && t.org_id === principal.orgId);
   if (!ok) return null;
   return t;
@@ -29,7 +29,7 @@ async function loadTicket(principal: Principal, id: string) {
 export default async function TicketPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const principal = (await getPrincipal())!;
-  const isStaff = primaryRole(principal) !== 'employee';
+  const isStaff = hasStaffScope(principal, 'helpdesk', 'update');
   const t = await loadTicket(principal, id);
   if (!t) return <Card><div className="muted">Ticket not found or you don't have access.</div></Card>;
   const sql = db();
@@ -48,22 +48,28 @@ export default async function TicketPage({ params }: { params: Promise<{ id: str
     if (!p) return;
     const tk = await loadTicket(p, id);
     if (!tk) return;
-    requirePermission(p, { resource: 'helpdesk', action: p.userId === tk.opened_by ? 'create' : 'update' });
+    const staff = hasStaffScope(p, 'helpdesk', 'update');
+    requirePermission(p, {
+      resource: 'helpdesk', action: p.userId === tk.opened_by ? 'create' : 'update', requireContext: true,
+      context: { orgId: tk.org_id, employeeId: tk.employee_id ?? undefined, ownerUserId: tk.opened_by ?? undefined },
+    });
     const body = String(formData.get('body') ?? '').trim();
     if (!body) return;
-    const internal = formData.get('internal') === 'on' && primaryRole(p) !== 'employee';
+    const internal = formData.get('internal') === 'on' && staff;
     const s = db();
     await s`insert into app.helpdesk_messages (org_id, ticket_id, author_user_id, body, internal)
             values (${tk.org_id}, ${id}, ${p.userId}, ${body}, ${internal})`;
     // Staff reply → move to pending (awaiting employee); notify the other party.
     if (!internal) {
-      if (primaryRole(p) !== 'employee' && tk.status === 'open') {
+      if (staff && tk.status === 'open') {
         await s`update app.helpdesk_tickets set status = 'pending', updated_at = now() where id = ${id}`;
       }
       const recipient = p.userId === tk.opened_by ? tk.assignee_user_id : tk.opened_by;
       if (recipient) {
-        await s`insert into app.notifications (org_id, recipient_user_id, channel, type, status, dedupe_key)
-                values (${tk.org_id}, ${recipient}, 'in_app', 'helpdesk_reply', 'pending', ${'ticket:' + id + ':reply:' + Date.now()})
+        await s`insert into app.notifications (org_id, recipient_user_id, channel, type, status, title, body, link, dedupe_key)
+                values (${tk.org_id}, ${recipient}, 'in_app', 'helpdesk_reply', 'pending',
+                        ${'New reply: ' + tk.subject}, ${body.slice(0, 140)}, ${'/hr/helpdesk/' + id},
+                        ${'ticket:' + id + ':reply:' + Date.now()})
                 on conflict (dedupe_key) do nothing`;
       }
     }
@@ -74,8 +80,13 @@ export default async function TicketPage({ params }: { params: Promise<{ id: str
     'use server';
     const p = await getPrincipal();
     if (!p) return;
-    requirePermission(p, { resource: 'helpdesk', action: 'update' });
-    await db()`update app.helpdesk_tickets set assignee_user_id = ${p.userId}, updated_at = now() where id = ${id}`;
+    const tk = await loadTicket(p, id);
+    if (!tk) return;
+    requirePermission(p, {
+      resource: 'helpdesk', action: 'update', requireContext: true,
+      context: { orgId: tk.org_id, employeeId: tk.employee_id ?? undefined, ownerUserId: tk.opened_by ?? undefined },
+    });
+    await db()`update app.helpdesk_tickets set assignee_user_id = ${p.userId}, updated_at = now() where id = ${id} and org_id = ${tk.org_id}`;
     revalidatePath(`/hr/helpdesk/${id}`);
   }
 
@@ -83,13 +94,21 @@ export default async function TicketPage({ params }: { params: Promise<{ id: str
     'use server';
     const p = await getPrincipal();
     if (!p) return;
-    requirePermission(p, { resource: 'helpdesk', action: 'update' });
+    const tk = await loadTicket(p, id);
+    if (!tk) return;
+    requirePermission(p, {
+      resource: 'helpdesk', action: 'update', requireContext: true,
+      context: { orgId: tk.org_id, employeeId: tk.employee_id ?? undefined, ownerUserId: tk.opened_by ?? undefined },
+    });
     const status = String(formData.get('status'));
+    if (!['open', 'pending', 'resolved', 'closed'].includes(status)) return;
     const s = db();
-    await s`update app.helpdesk_tickets set status = ${status}, resolved_at = ${status === 'resolved' || status === 'closed' ? s`now()` : null}, updated_at = now() where id = ${id}`;
-    if (t && t.opened_by && (status === 'resolved' || status === 'closed')) {
-      await s`insert into app.notifications (org_id, recipient_user_id, channel, type, status, dedupe_key)
-              values (${t.org_id}, ${t.opened_by}, 'in_app', 'helpdesk_status', 'pending', ${'ticket:' + id + ':status:' + status})
+    await s`update app.helpdesk_tickets set status = ${status}, resolved_at = ${status === 'resolved' || status === 'closed' ? s`now()` : null}, updated_at = now() where id = ${id} and org_id = ${tk.org_id}`;
+    if (tk.opened_by && (status === 'resolved' || status === 'closed')) {
+      await s`insert into app.notifications (org_id, recipient_user_id, channel, type, status, title, body, link, dedupe_key)
+              values (${tk.org_id}, ${tk.opened_by}, 'in_app', 'helpdesk_status', 'pending',
+                      ${'Ticket ' + status + ': ' + tk.subject}, ${'Your help-desk ticket was marked ' + status + '.'}, ${'/hr/helpdesk/' + id},
+                      ${'ticket:' + id + ':status:' + status})
               on conflict (dedupe_key) do nothing`;
     }
     revalidatePath(`/hr/helpdesk/${id}`);

@@ -11,8 +11,11 @@ async function openTicket(formData: FormData) {
   'use server';
   const principal = await getPrincipal();
   if (!principal) return;
-  requirePermission(principal, { resource: 'helpdesk', action: 'create' });
   const emp = await myEmployee(principal);
+  requirePermission(principal, {
+    resource: 'helpdesk', action: 'create', requireContext: true,
+    context: { ownerUserId: principal.userId, orgId: principal.orgId, employeeId: emp?.id },
+  });
   const sql = db();
   const [t] = await sql`
     insert into app.helpdesk_tickets (org_id, employee_id, opened_by, subject, body, status, scope, priority, category)
@@ -22,9 +25,12 @@ async function openTicket(formData: FormData) {
   const staff = await sql<{ id: string }[]>`
     select distinct u.id from app.user_roles ur join app.roles r on r.id = ur.role_id join app.users u on u.id = ur.user_id
     where ur.org_id = ${principal.orgId} and r.key in ('hr','employer','admin')`;
+  const subject = String(formData.get('subject'));
   for (const s of staff) {
-    await sql`insert into app.notifications (org_id, recipient_user_id, channel, type, status, dedupe_key)
-              values (${principal.orgId}, ${s.id}, 'in_app', 'helpdesk_new_ticket', 'pending', ${'ticket:' + (t!.id as string) + ':new:' + s.id})
+    await sql`insert into app.notifications (org_id, recipient_user_id, channel, type, status, title, body, link, dedupe_key)
+              values (${principal.orgId}, ${s.id}, 'in_app', 'helpdesk_new_ticket', 'pending',
+                      ${'New ticket: ' + subject}, ${(emp?.full_name ?? 'An employee') + ' raised a help-desk ticket.'}, ${'/hr/helpdesk/' + (t!.id as string)},
+                      ${'ticket:' + (t!.id as string) + ':new:' + s.id})
               on conflict (dedupe_key) do nothing`;
   }
   redirect(`/hr/helpdesk/${t!.id}`);

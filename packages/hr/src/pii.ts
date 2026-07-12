@@ -106,6 +106,67 @@ export async function storeW4(
   });
 }
 
+/** Sensitive immigration identifiers kept out of the plaintext profile (§12). */
+export interface SecureIds {
+  passport_number?: string;
+  passport_country?: string;
+  passport_issue?: string;
+  passport_expiry?: string;
+  sevis_number?: string;
+  alien_registration_number?: string;
+}
+
+export async function storeSecureIds(
+  sql: postgres.Sql,
+  audit: AuditSink,
+  principal: Principal,
+  employeeId: string,
+  ids: SecureIds,
+): Promise<void> {
+  const ctx = await employeeContext(sql, employeeId);
+  if (!ctx) throw new Error('employee not found');
+  const grant = requirePermission(principal, {
+    resource: 'sensitive_pii', action: 'create', requireContext: true,
+    context: { employeeId, ownerUserId: ctx.user_id ?? undefined, orgId: ctx.org_id },
+  });
+  const ciphertext = encryptPII(JSON.stringify(ids));
+  await sql`
+    insert into app.employee_secure_ids (employee_id, org_id, encrypted_payload)
+    values (${employeeId}, ${ctx.org_id}, ${ciphertext})
+    on conflict (employee_id) do update set encrypted_payload = excluded.encrypted_payload, updated_at = now()`;
+  await audit.record({
+    actorUserId: principal.userId,
+    orgId: ctx.org_id,
+    action: 'sensitive_pii.create',
+    resource: `employee_secure_ids:${employeeId}`,
+    matchedPermission: `${grant.resource}:${grant.action}:${grant.scope}`,
+  });
+}
+
+export async function readSecureIds(
+  sql: postgres.Sql,
+  audit: AuditSink,
+  principal: Principal,
+  employeeId: string,
+): Promise<SecureIds | null> {
+  const ctx = await employeeContext(sql, employeeId);
+  if (!ctx) return null;
+  const grant = requirePermission(principal, {
+    resource: 'sensitive_pii', action: 'read', requireContext: true,
+    context: { employeeId, ownerUserId: ctx.user_id ?? undefined, orgId: ctx.org_id },
+  });
+  await audit.record({
+    actorUserId: principal.userId,
+    orgId: ctx.org_id,
+    action: 'sensitive_pii.read',
+    resource: `employee_secure_ids:${employeeId}`,
+    matchedPermission: `${grant.resource}:${grant.action}:${grant.scope}`,
+  });
+  const [row] = await sql<{ encrypted_payload: string }[]>`
+    select encrypted_payload from app.employee_secure_ids where employee_id = ${employeeId}`;
+  return row ? (JSON.parse(decryptPII(row.encrypted_payload)) as SecureIds) : null;
+}
+
 export async function readW4(
   sql: postgres.Sql,
   audit: AuditSink,

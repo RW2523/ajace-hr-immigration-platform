@@ -21,6 +21,16 @@ export function toISO(d: Date): string {
 export function addDays(iso: string, days: number): string {
   return toISO(new Date(parseDate(iso).getTime() + days * MS_PER_DAY));
 }
+/** Add N calendar months, clamping the day-of-month to the target month's length
+ *  (e.g. Jan 31 + 1mo → Feb 28/29). Used for month-denominated windows/deadlines. */
+export function addMonths(iso: string, months: number): string {
+  const d = parseDate(iso);
+  const day = d.getUTCDate();
+  const target = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + months, 1));
+  const lastDay = new Date(Date.UTC(target.getUTCFullYear(), target.getUTCMonth() + 1, 0)).getUTCDate();
+  target.setUTCDate(Math.min(day, lastDay));
+  return toISO(target);
+}
 /** Calendar days from `a` to `b` (b - a). Negative if b precedes a. */
 export function daysBetween(a: string, b: string): number {
   return Math.round((parseDate(b).getTime() - parseDate(a).getTime()) / MS_PER_DAY);
@@ -95,8 +105,14 @@ export function gracePeriod(
   index: RuleIndex,
   asOf: string,
 ): GracePeriod | null {
-  // Try a status-specific grace rule first (e.g. grace_period_days_after_program_or_opt).
-  const candidates = ['grace_period_days_after_program_or_opt', 'grace_period_days', 'termination_grace_period_days'];
+  // Try a status-specific grace rule first (e.g. grace_period_days_after_program_or_opt
+  // for F-1, post_employment_grace_period_days for H-1B termination — both seeded).
+  const candidates = [
+    'grace_period_days_after_program_or_opt',
+    'post_employment_grace_period_days',
+    'grace_period_days',
+    'termination_grace_period_days',
+  ];
   for (const attr of candidates) {
     const r = index.number(status, attr, asOf);
     if (r) {
@@ -150,10 +166,15 @@ export function h1bExtensionWindow(
   index: RuleIndex,
   asOf: string,
 ): Window | null {
-  const months = index.number('h1b_active__h1b_extension_pending', 'extension_filing_window_months_before_expiry', asOf)
-    ?? index.number('h1b_active', 'extension_filing_window_months_before_expiry', asOf);
+  // Seed uses `earliest_filing_before_start_months` under the h1b_extension_pending
+  // key (value 6); older synthetic keys kept for backward-compatible callers/tests.
+  const months =
+    index.number('h1b_extension_pending', 'earliest_filing_before_start_months', asOf) ??
+    index.number('h1b_active', 'earliest_filing_before_start_months', asOf) ??
+    index.number('h1b_active__h1b_extension_pending', 'extension_filing_window_months_before_expiry', asOf) ??
+    index.number('h1b_active', 'extension_filing_window_months_before_expiry', asOf);
   if (!months) return null;
-  const earliest = addDays(validityExpiry, -Math.round(months.value * 30.44));
+  const earliest = addMonths(validityExpiry, -months.value);
   return {
     earliest,
     latest: validityExpiry,
@@ -174,16 +195,37 @@ export function ac21OneYearToFile(
   index: RuleIndex,
   asOf: string,
 ): { deadline: string; lapsed: boolean; rulesCited: string[]; counselPending: boolean } | null {
-  const r =
+  // Prefer an explicit days rule; else the seeded months rule
+  // (`post_6yr_106a_failure_to_file_bar_months` = 12 under i140_approved).
+  const daysRule =
     index.number('i140_approved__h1b_extension_pending', 'ac21_one_year_to_file_i485_days', asOf) ??
     index.number('i140_approved', 'ac21_one_year_to_file_i485_days', asOf);
-  const days = r?.value ?? 365; // 365 is INA-level; if seed lacks it, still compute but flag counselPending
-  const deadline = addDays(priorityDateBecameCurrent, days);
+  const monthsRule =
+    index.number('i140_approved', 'post_6yr_106a_failure_to_file_bar_months', asOf) ??
+    index.number('i140_approved__h1b_extension_pending', 'post_6yr_106a_failure_to_file_bar_months', asOf);
+
+  let deadline: string;
+  let rulesCited: string[];
+  let counselPending: boolean;
+  if (daysRule) {
+    deadline = addDays(priorityDateBecameCurrent, daysRule.value);
+    rulesCited = [daysRule.provenance.ruleId];
+    counselPending = !daysRule.provenance.confirmedByCounsel;
+  } else if (monthsRule) {
+    deadline = addMonths(priorityDateBecameCurrent, monthsRule.value);
+    rulesCited = [monthsRule.provenance.ruleId];
+    counselPending = !monthsRule.provenance.confirmedByCounsel;
+  } else {
+    // 365 is INA-level; if seed lacks it, still compute but flag counselPending.
+    deadline = addDays(priorityDateBecameCurrent, 365);
+    rulesCited = [];
+    counselPending = true;
+  }
   return {
     deadline,
     lapsed: !i485Filed && asOf > deadline,
-    rulesCited: r ? [r.provenance.ruleId] : [],
-    counselPending: r ? !r.provenance.confirmedByCounsel : true,
+    rulesCited,
+    counselPending,
   };
 }
 
@@ -198,9 +240,11 @@ export function i9Deadlines(
   asOf: string,
 ): { section2Due: string; everifyDue: string; rulesCited: string[]; counselPending: boolean } | null {
   const s2 =
+    index.number('all', 'section2_completion_window_business_days', asOf) ??
     index.number('all', 'i9_section2_business_days', asOf) ??
     index.number('all', 'i9_section2_deadline_business_days', asOf);
   const ev =
+    index.number('all', 'case_creation_deadline_business_days', asOf) ??
     index.number('all', 'everify_case_business_days', asOf) ??
     index.number('all', 'everify_case_creation_business_days', asOf);
   if (!s2 && !ev) return null;

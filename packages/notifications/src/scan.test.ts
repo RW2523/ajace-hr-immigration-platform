@@ -49,10 +49,25 @@ describe('idempotency', () => {
     expect(second).toHaveLength(0);
   });
 
-  it('dedupe keys are stable and unique per (case,type,offset,level)', () => {
-    expect(dedupeKey('c', 'opt_ead_expiry', 14, 2)).toBe('c:opt_ead_expiry:o14:l2');
+  it('dedupe keys are stable and unique per (case,type,date,offset,level)', () => {
+    expect(dedupeKey('c', 'opt_ead_expiry', '2026-12-01', 14, 2)).toBe('c:opt_ead_expiry:d2026-12-01:o14:l2');
     const due = computeDueReminders(dates, [trigger], '2026-11-17');
     expect(new Set(due.map((d) => d.dedupeKey)).size).toBe(due.length);
+  });
+
+  it('a corrected/renewed date fires a fresh series even when the old keys were sent', () => {
+    // Old EAD expiry 2026-12-01, all its 14-day reminders already sent.
+    const first = computeDueReminders(dates, [trigger], '2026-11-17');
+    const sent = new Set(first.map((d) => d.dedupeKey));
+    expect(first.length).toBeGreaterThan(0);
+
+    // EAD renewed: new expiry 2027-02-15. The new target date yields new keys, so
+    // reminders fire despite the old series being in `sent`.
+    const renewed: TrackedDate[] = [{ caseId: 'case-1', dateType: 'opt_ead_expiry', targetDate: '2027-02-15' }];
+    const after = computeDueReminders(renewed, [trigger], '2027-02-01', sent); // 14 days before new date
+    const at14 = after.filter((d) => d.offsetDays === 14);
+    expect(at14.length).toBe(3); // employee + hr + counsel fire on the new date
+    expect(after.every((d) => !sent.has(d.dedupeKey))).toBe(true);
   });
 });
 

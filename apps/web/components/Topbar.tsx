@@ -1,7 +1,8 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bell, ChevronRight, Search } from 'lucide-react';
+import { ChevronRight, Search } from 'lucide-react';
+import { NotificationsBell, type Notice } from './NotificationsBell';
 
 const LABELS: Record<string, string> = {
   dashboard: 'Dashboard', cases: 'Cases', people: 'People', profile: 'My Profile',
@@ -9,7 +10,7 @@ const LABELS: Record<string, string> = {
   rules: 'Rules Engine', audit: 'Audit Log',
 };
 
-export function Topbar({ initials, alerts = 0 }: { initials: string; alerts?: number }) {
+export function Topbar({ initials, notices, markAllRead }: { initials: string; notices: Notice[]; markAllRead: () => Promise<void> }) {
   const pathname = usePathname();
   const parts = pathname.split('/').filter(Boolean);
   const crumbs = parts.map((p, i) => ({
@@ -34,10 +35,7 @@ export function Topbar({ initials, alerts = 0 }: { initials: string; alerts?: nu
         <Search size={15} />
         <input placeholder="Search cases, people, documents…" />
       </div>
-      <Link href="/hr/helpdesk" className="icon-btn" title={alerts > 0 ? `${alerts} new notification${alerts > 1 ? 's' : ''}` : 'Notifications'}>
-        <Bell size={17} />
-        {alerts > 0 && <span className="badge-count">{alerts > 9 ? '9+' : alerts}</span>}
-      </Link>
+      <NotificationsBell notices={notices} markAllRead={markAllRead} />
       <div className="avatar" title="Account">{initials}</div>
     </div>
   );

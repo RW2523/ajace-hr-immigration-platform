@@ -1,7 +1,7 @@
 import { revalidatePath } from 'next/cache';
 import { CheckCircle2, FileText, Info, ListChecks, Sparkle } from 'lucide-react';
 import { getPrincipal, db } from '@/lib/session';
-import { requirePermission } from '@hr/shared';
+import { requirePermission, encryptPII } from '@hr/shared';
 import { documentPath, signedDownloadUrl, uploadDocument } from '@/lib/storage';
 import { extractDocument } from '@/lib/extract';
 import { ingestDocumentText, defaultEmbedder } from '@hr/rag';
@@ -59,8 +59,12 @@ async function upload(formData: FormData) {
   try {
     const { text, method } = await extractDocument(bytes, file.type || null, file.name);
     if (doc) {
-      await sql`update app.documents set extracted_text = ${text || null}, extraction_method = ${method} where id = ${doc.id}`;
-      await ingestDocumentText(sql, defaultEmbedder(), { orgId: emp.org_id, employeeId: emp.id, userId: principal.userId, documentId: doc.id, docType: documentType, filename: file.name, text });
+      // §12: for sensitive documents (passport/EAD/SSN card) the extracted text is
+      // PII — store it app-layer-encrypted at rest, and keep its contents OUT of the
+      // general RAG index (ingest only a protected metadata chunk).
+      const storedText = text ? (sensitive ? encryptPII(text) : text) : null;
+      await sql`update app.documents set extracted_text = ${storedText}, extraction_method = ${method} where id = ${doc.id}`;
+      await ingestDocumentText(sql, defaultEmbedder(), { orgId: emp.org_id, employeeId: emp.id, userId: principal.userId, documentId: doc.id, docType: documentType, filename: file.name, text, sensitive });
     }
   } catch { /* extraction/ingestion is best-effort; upload already succeeded */ }
   revalidatePath('/documents');

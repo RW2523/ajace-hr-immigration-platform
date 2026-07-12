@@ -82,6 +82,23 @@ const EMPLOYER: RoleDefinition = {
   ],
 };
 
+const COUNSEL: RoleDefinition = {
+  key: 'counsel',
+  label: 'Counsel',
+  description:
+    'Immigration attorney / counsel of record. Receives the escalated (tier 3) deadline reminders; read access to case internals and work authorization for the org.',
+  // Ranked alongside HR (2): an operational, read-scoped reviewer — not firm leadership.
+  rank: 2,
+  permissions: [
+    ...grant('own_profile', ['read', 'update'], 'own'),
+    ...grant('others_profiles', ['read'], 'org'),
+    ...grant('case_internals', ['read'], 'org'),
+    ...grant('work_authorization', ['read'], 'org'),
+    ...grant('sensitive_pii', ['read'], 'org'), // need-to-know for filings; audited
+    ...grant('documents', ['read'], 'org'),
+  ],
+};
+
 const ADMIN: RoleDefinition = {
   key: 'admin',
   label: 'Admin',
@@ -100,7 +117,7 @@ const ADMIN: RoleDefinition = {
   ],
 };
 
-export const DEFAULT_ROLES: RoleDefinition[] = [ADMIN, EMPLOYER, HR, EMPLOYEE];
+export const DEFAULT_ROLES: RoleDefinition[] = [ADMIN, EMPLOYER, COUNSEL, HR, EMPLOYEE];
 
 export function roleByKey(key: string): RoleDefinition | undefined {
   return DEFAULT_ROLES.find((r) => r.key === key);

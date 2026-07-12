@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { FileCheck2, ClipboardList, ShieldQuestion } from 'lucide-react';
 import { getPrincipal, db } from '@/lib/session';
 import { requirePermission } from '@hr/shared';
+import { CaseEngine } from '@hr/workflow';
 import { Card, Pill } from '@/components/ui';
 
 async function submitIntake(formData: FormData) {
@@ -9,15 +10,30 @@ async function submitIntake(formData: FormData) {
   const principal = await getPrincipal();
   if (!principal) redirect('/login');
   const category = String(formData.get('category') ?? '');
+  if (!category) return;
   const sql = db();
   const [emp] = await sql<{ id: string; org_id: string; user_id: string | null }[]>`select id, org_id, user_id from app.employees where user_id = ${principal!.userId}`;
   if (!emp) return;
-  requirePermission(principal!, { resource: 'own_profile', action: 'update', context: { ownerUserId: emp.user_id ?? undefined, orgId: emp.org_id } });
+  requirePermission(principal!, { resource: 'own_profile', action: 'update', requireContext: true, context: { ownerUserId: emp.user_id ?? undefined, orgId: emp.org_id } });
   await sql`update app.employees set work_authorization_category = ${category}, updated_at = now() where id = ${emp.id}`;
-  const [existing] = await sql`select id from app.immigration_cases where employee_id = ${emp.id}`;
-  if (existing) { await sql`update app.immigration_cases set current_status = ${category}, updated_at = now() where id = ${existing.id}`; redirect(`/cases/${existing.id}`); }
-  const [c] = await sql`insert into app.immigration_cases (org_id, employee_id, current_status) values (${emp.org_id}, ${emp.id}, ${category}) returning id`;
-  redirect(`/cases/${c!.id}`);
+  const [existing] = await sql<{ id: string; current_status: string }[]>`select id, current_status from app.immigration_cases where employee_id = ${emp.id}`;
+  let caseId: string;
+  if (existing) {
+    // Route the status change through the workflow engine so it is recorded in
+    // case history. Intake is a self-declared correction, so it is a forced
+    // (audited) transition rather than an eligibility-gated advance.
+    if (existing.current_status !== category) {
+      await new CaseEngine(sql).advance(
+        { caseId: existing.id, toStatus: category, transitionKey: 'intake_declaration', initiatedBy: principal!.userId, force: true },
+        new Date().toISOString().slice(0, 10),
+      );
+    }
+    caseId = existing.id;
+  } else {
+    const [c] = await sql<{ id: string }[]>`insert into app.immigration_cases (org_id, employee_id, current_status) values (${emp.org_id}, ${emp.id}, ${category}) returning id`;
+    caseId = c!.id;
+  }
+  redirect(`/cases/${caseId}`);
 }
 
 export default async function IntakePage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {

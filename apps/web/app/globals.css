@@ -138,6 +138,23 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .
 .dot { position: absolute; top: 8px; right: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--danger); border: 2px solid var(--surface); }
 .badge-count { position: absolute; top: -5px; right: -5px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--danger); color: #fff; font-size: 10.5px; font-weight: 700; display: grid; place-items: center; border: 2px solid var(--surface); }
 
+/* Notifications bell popover */
+.notif-wrap { position: relative; display: inline-flex; }
+.notif-backdrop { position: fixed; inset: 0; z-index: 40; }
+.notif-pop { position: absolute; top: 46px; right: 0; z-index: 50; width: 340px; max-width: 88vw; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--sh-lg, 0 12px 32px rgba(15,23,42,.16)); overflow: hidden; }
+.notif-pop-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid var(--border-2); }
+.notif-markall { display: inline-flex; align-items: center; gap: 5px; border: 0; background: transparent; color: var(--brand-600); font-size: 12px; font-weight: 650; cursor: pointer; }
+.notif-markall:hover { text-decoration: underline; }
+.notif-list { max-height: 380px; overflow-y: auto; }
+.notif-empty { padding: 26px 14px; text-align: center; color: var(--muted); font-size: 13px; }
+.notif-item { display: flex; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border-2); color: inherit; text-decoration: none; transition: background .12s; }
+.notif-item:last-child { border-bottom: 0; }
+a.notif-item:hover { background: var(--bg-soft); }
+.notif-dot { flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--brand-500); margin-top: 5px; }
+.notif-title { font-weight: 650; font-size: 13px; color: var(--ink); }
+.notif-body { font-size: 12.5px; color: var(--ink-2); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.notif-time { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
 .content { padding: 28px; max-width: 1160px; width: 100%; margin: 0 auto; }
 .page-head { margin-bottom: 22px; }
 .page-title { font-size: 26px; font-weight: 800; letter-spacing: -.03em; }

@@ -32,6 +32,9 @@ importers:
       '@hr/hr':
         specifier: workspace:*
         version: link:../../packages/hr
+      '@hr/notifications':
+        specifier: workspace:*
+        version: link:../../packages/notifications
       '@hr/rag':
         specifier: workspace:*
         version: link:../../packages/rag

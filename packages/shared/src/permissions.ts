@@ -96,6 +96,13 @@ export interface AccessRequest {
   action: Action;
   /** The specific instance being accessed. Omit for collection-level checks. */
   context?: ResourceContext;
+  /**
+   * Instance-mutation guard. When true, a non-`global` scope will NOT be satisfied
+   * unless the matching context attribute is present. This closes the write-path
+   * IDOR class where a mutation calls requirePermission with no context and a
+   * context-less scope check silently passes. Set it on every row mutation.
+   */
+  requireContext?: boolean;
 }
 
 export interface AccessDecision {
@@ -124,7 +131,7 @@ export function decide(principal: Principal, req: AccessRequest): AccessDecision
   // most specific matched permission for a precise audit record.
   let best: Permission | undefined;
   for (const p of candidates) {
-    if (scopeSatisfied(principal, p.scope, req.context)) {
+    if (scopeSatisfied(principal, p.scope, req.context, req.requireContext)) {
       if (!best || SCOPE_RANK[p.scope] < SCOPE_RANK[best.scope]) best = p;
     }
   }
@@ -137,23 +144,41 @@ export function decide(principal: Principal, req: AccessRequest): AccessDecision
   return { allowed: true, matchedPermission: best, reason: 'granted' };
 }
 
-function scopeSatisfied(principal: Principal, scope: Scope, ctx?: ResourceContext): boolean {
+function scopeSatisfied(
+  principal: Principal,
+  scope: Scope,
+  ctx?: ResourceContext,
+  requireContext = false,
+): boolean {
   switch (scope) {
     case 'global':
       return true;
     case 'org':
-      // Collection-level (no ctx) org checks pass; instance checks must match org.
+      // Collection-level (no ctx) org checks pass UNLESS the caller demands an
+      // instance check (requireContext) — then a missing org is a denial.
+      if (requireContext && !ctx?.orgId) return false;
       return !ctx?.orgId || ctx.orgId === principal.orgId;
     case 'assigned':
-      if (!ctx) return true; // collection-level; row filtering applied downstream
+      if (!ctx) return !requireContext; // collection-level; row filtering applied downstream
       if (ctx.ownerUserId && ctx.ownerUserId === principal.userId) return true;
       return !!ctx.employeeId && principal.assignedEmployeeIds.includes(ctx.employeeId);
     case 'own':
-      if (!ctx) return true;
+      if (!ctx) return !requireContext;
       return !!ctx.ownerUserId && ctx.ownerUserId === principal.userId;
     default:
       return false;
   }
+}
+
+/**
+ * True if the principal can act on rows beyond their own — i.e. holds
+ * (resource, action) at `assigned`, `org`, or `global` scope. Use this for
+ * staff-vs-employee UI and gating decisions instead of role-key inspection,
+ * which the `primaryRole` contract explicitly forbids for authorization.
+ */
+export function hasStaffScope(principal: Principal, resource: Resource, action: Action): boolean {
+  const s = effectiveScope(principal, resource, action);
+  return s === 'assigned' || s === 'org' || s === 'global';
 }
 
 /** Thrown when a request is denied. Carries no sensitive detail. */

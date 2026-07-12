@@ -93,12 +93,27 @@ function chunkText(text: string, size = 700, overlap = 90): string[] {
 export async function ingestDocumentText(
   sql: postgres.Sql,
   embedder: Embedder,
-  opts: { orgId: string; employeeId: string | null; userId: string | null; documentId: string; docType: string; filename: string; text: string },
+  opts: { orgId: string; employeeId: string | null; userId: string | null; documentId: string; docType: string; filename: string; text: string; sensitive?: boolean },
 ): Promise<number> {
   await sql`delete from app.rag_chunks where source_document_id = ${opts.documentId}`;
+  const label = opts.docType.replace(/_/g, ' ');
+  // §12: never place the CONTENTS of a sensitive document (passport/EAD/SSN card)
+  // into the general knowledge index as plaintext. Keep only a findable metadata
+  // chunk; the raw text stays encrypted on the document row and is surfaced only
+  // through audited, authorized paths.
+  if (opts.sensitive) {
+    await ingestChunk(sql, embedder, {
+      orgId: opts.orgId,
+      content: `Sensitive document on file: "${opts.filename}" (${label}). Contents are protected; ask HR or view it under Documents.`,
+      docType: 'case_doc',
+      ownerUserId: opts.userId,
+      ownerEmployeeId: opts.employeeId,
+      sourceDocumentId: opts.documentId,
+    });
+    return 1;
+  }
   const chunks = chunkText(opts.text);
   let n = 0;
-  const label = opts.docType.replace(/_/g, ' ');
   for (const c of chunks) {
     await ingestChunk(sql, embedder, {
       orgId: opts.orgId,

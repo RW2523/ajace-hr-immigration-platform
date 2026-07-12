@@ -9,7 +9,7 @@
  *   filed → receipt → [rfe → response] → approved | denied → [refile]
  */
 import type postgres from 'postgres';
-import { loadRuleData, validateCase, type CaseSnapshot } from '@hr/rules-engine';
+import { addDays, daysBetween, loadRuleData, validateCase, type CaseSnapshot } from '@hr/rules-engine';
 
 export interface AdvanceInput {
   caseId: string;
@@ -33,33 +33,120 @@ export interface AdvanceResult {
   blockedReasons?: string[];
 }
 
+/**
+ * Pure interval math for Bug 5: aggregate calendar days of unemployment inside the
+ * OPT window [optStart, windowEnd] (inclusive), given employment (placement)
+ * intervals. Placements are clipped to the window and merged; unemployment is the
+ * window days not covered by any placement. An open-ended placement (null end)
+ * counts as employed through windowEnd. Dates are ISO (YYYY-MM-DD).
+ */
+export function unemploymentDaysFromIntervals(
+  placements: ReadonlyArray<{ start_date: string | null; end_date: string | null }>,
+  optStart: string,
+  windowEnd: string,
+): number {
+  if (windowEnd <= optStart) return 0;
+  const intervals = placements
+    .filter((p) => p.start_date)
+    .map((p) => ({
+      start: p.start_date! < optStart ? optStart : p.start_date!,
+      end: !p.end_date || p.end_date > windowEnd ? windowEnd : p.end_date,
+    }))
+    .filter((iv) => iv.start <= iv.end)
+    .sort((a, b) => a.start.localeCompare(b.start));
+
+  let employedDays = 0;
+  let cursor: string | null = null; // last covered day (inclusive)
+  for (const iv of intervals) {
+    const from = cursor && iv.start <= cursor ? addDays(cursor, 1) : iv.start;
+    if (from > iv.end) continue; // fully covered by a prior interval
+    employedDays += daysBetween(from, iv.end) + 1; // inclusive day count
+    cursor = iv.end > (cursor ?? '') ? iv.end : cursor;
+  }
+
+  const windowDays = daysBetween(optStart, windowEnd) + 1;
+  return Math.max(0, windowDays - employedDays);
+}
+
+/**
+ * Canonical case-snapshot builder — the SINGLE source of truth for turning a case's
+ * stored rows into a CaseSnapshot for the validator. The web case page, the MCP
+ * case-server, and the CaseEngine all use this, so eligibility/findings never differ
+ * by caller (previously the web page hard-coded an empty document list and diverged).
+ */
+export async function buildCaseSnapshot(
+  sql: postgres.Sql,
+  caseId: string,
+  asOf: string,
+): Promise<{ snapshot: CaseSnapshot; orgId: string; employeeId: string }> {
+  const [c] = await sql<{ org_id: string; current_status: string; employee_id: string }[]>`
+    select org_id, current_status, employee_id from app.immigration_cases where id = ${caseId}`;
+  if (!c) throw new Error('case not found');
+  const dateRows = await sql<{ date_type: string; value: string }[]>`
+    select date_type, to_char(value,'YYYY-MM-DD') as value from app.case_dates where case_id = ${caseId}`;
+  const docRows = await sql<{ document_type: string }[]>`
+    select document_type from app.documents where case_id = ${caseId}`;
+  const dates: Record<string, string> = {};
+  for (const r of dateRows) dates[r.date_type] = r.value;
+
+  // Compute unemployment days used from real placement gaps for OPT statuses; leave
+  // UNDEFINED when unanchored so the validator reports "unknown / counsel review"
+  // rather than a confident 0/limit.
+  const unemploymentDaysUsed =
+    c.current_status === 'f1_opt' || c.current_status === 'f1_stem_opt'
+      ? await computeUnemploymentDaysUsed(sql, c.employee_id, dates, asOf)
+      : undefined;
+
+  return {
+    orgId: c.org_id,
+    employeeId: c.employee_id,
+    snapshot: {
+      currentStatus: c.current_status,
+      dates,
+      collectedDocuments: docRows.map((d) => d.document_type),
+      attributes: {},
+      ...(unemploymentDaysUsed !== undefined ? { unemploymentDaysUsed } : {}),
+    },
+  };
+}
+
+/**
+ * Aggregate calendar days of unemployment during the post-completion OPT period,
+ * computed from placement (employment) intervals. Returns UNDEFINED (→ validator
+ * reports "unknown") when there is no OPT anchor date or no placement rows at all,
+ * so we never fabricate a count. A laid-off employee whose placement ENDED has a
+ * row with an end_date, so their post-layoff gap IS counted. Mechanical day count,
+ * not a legal determination — the validator's finding stays counsel-pending.
+ */
+async function computeUnemploymentDaysUsed(
+  sql: postgres.Sql,
+  employeeId: string,
+  dates: Record<string, string>,
+  asOf: string,
+): Promise<number | undefined> {
+  const optStart = dates['opt_ead_start'] ?? dates['ead_start'];
+  if (!optStart) return undefined; // no anchor → unknown
+  const windowEnd = dates['opt_ead_expiry'] && dates['opt_ead_expiry'] < asOf ? dates['opt_ead_expiry'] : asOf;
+  if (windowEnd <= optStart) return 0;
+
+  const placements = await sql<{ start_date: string | null; end_date: string | null }[]>`
+    select to_char(start_date,'YYYY-MM-DD') as start_date, to_char(end_date,'YYYY-MM-DD') as end_date
+    from app.placements where employee_id = ${employeeId}`;
+  if (placements.length === 0) return undefined; // no employment data → unknown
+
+  return unemploymentDaysFromIntervals(placements, optStart, windowEnd);
+}
+
 export class CaseEngine {
   constructor(private sql: postgres.Sql) {}
 
-  private async snapshot(caseId: string): Promise<{ snapshot: CaseSnapshot; orgId: string }> {
-    const [c] = await this.sql<{ org_id: string; current_status: string }[]>`
-      select org_id, current_status from app.immigration_cases where id = ${caseId}`;
-    if (!c) throw new Error('case not found');
-    const dateRows = await this.sql<{ date_type: string; value: string }[]>`
-      select date_type, to_char(value,'YYYY-MM-DD') as value from app.case_dates where case_id = ${caseId}`;
-    const docRows = await this.sql<{ document_type: string }[]>`
-      select document_type from app.documents where case_id = ${caseId}`;
-    const dates: Record<string, string> = {};
-    for (const r of dateRows) dates[r.date_type] = r.value;
-    return {
-      orgId: c.org_id,
-      snapshot: {
-        currentStatus: c.current_status,
-        dates,
-        collectedDocuments: docRows.map((d) => d.document_type),
-        attributes: {},
-      },
-    };
+  private async snapshot(caseId: string, asOf: string): Promise<{ snapshot: CaseSnapshot; orgId: string }> {
+    return buildCaseSnapshot(this.sql, caseId, asOf);
   }
 
   /** Advance a case, validating eligibility against the rules unless forced. */
   async advance(input: AdvanceInput, asOf: string): Promise<AdvanceResult> {
-    const { snapshot, orgId } = await this.snapshot(input.caseId);
+    const { snapshot, orgId } = await this.snapshot(input.caseId, asOf);
     const fromStatus = snapshot.currentStatus;
 
     if (!input.force) {
@@ -69,15 +156,26 @@ export class CaseEngine {
         result.eligibleTransitions.find((t) => t.toStatus === input.toStatus) ??
         result.eligibleTransitions.find((t) => t.transitionKey === input.transitionKey);
       if (!target) {
+        // A transition blocked only by preconditions the engine cannot confirm is
+        // NOT auto-advanced — counsel must confirm (or the caller uses force).
+        const review = result.needsCounselReviewTransitions.find(
+          (t) => t.toStatus === input.toStatus || t.transitionKey === input.transitionKey,
+        );
         const blocked = result.ineligibleTransitions.find((t) => t.toStatus === input.toStatus);
+        const reasons = review
+          ? [
+              'pending counsel review — preconditions cannot be mechanically confirmed:',
+              ...review.unconfirmedPreconditions,
+            ]
+          : blocked
+            ? [...blocked.unmetPreconditions, ...blocked.missingDocuments.map((d) => `missing document: ${d}`)]
+            : [`no eligible transition from ${fromStatus} to ${input.toStatus}`];
         return {
           ok: false,
           caseId: input.caseId,
           fromStatus,
           toStatus: input.toStatus,
-          blockedReasons: blocked
-            ? [...blocked.unmetPreconditions, ...blocked.missingDocuments.map((d) => `missing document: ${d}`)]
-            : [`no eligible transition from ${fromStatus} to ${input.toStatus}`],
+          blockedReasons: reasons,
         };
       }
     }

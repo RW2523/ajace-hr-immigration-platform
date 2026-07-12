@@ -66,8 +66,12 @@ const myStatus: AgentTool = {
     const snap: CaseSnapshot = { currentStatus: e.current_status, dates, collectedDocuments: [], attributes: {} };
     const res = validateCase(data, snap, new Date().toISOString().slice(0, 10));
     const next = res.eligibleTransitions.map((t) => t.toStatus.replace(/_/g, ' '));
+    // Transitions gated on legal preconditions the engine cannot self-confirm are
+    // shown as pending counsel review, never as a firm "eligible" step (Bug 1).
+    const review = res.needsCounselReviewTransitions.map((t) => t.toStatus.replace(/_/g, ' '));
+    const reviewText = review.length ? ` Pending counsel review: ${review.join(', ')}.` : '';
     return {
-      text: `Current status: ${e.current_status.replace(/_/g, ' ')}${e.country ? ` (country of birth: ${e.country})` : ''}. Eligible next steps: ${next.length ? next.join(', ') : 'none right now'}.`,
+      text: `Current status: ${e.current_status.replace(/_/g, ' ')}${e.country ? ` (country of birth: ${e.country})` : ''}. Eligible next steps: ${next.length ? next.join(', ') : 'none right now'}.${reviewText}`,
       sources: [{ label: 'case', detail: `Status ${e.current_status}` }],
     };
   },
