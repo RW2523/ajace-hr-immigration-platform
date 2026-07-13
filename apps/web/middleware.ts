@@ -69,7 +69,10 @@ export async function middleware(request: NextRequest) {
 
   const { data } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
-  const isPublic = PUBLIC_PATHS.includes(path) || path.startsWith('/_next') || path.startsWith('/favicon');
+  // API routes enforce their OWN auth (assistant checks the principal, cron checks
+  // a secret, health is public) and must return JSON — never an HTML login redirect.
+  const isApi = path.startsWith('/api/');
+  const isPublic = isApi || PUBLIC_PATHS.includes(path) || path.startsWith('/_next') || path.startsWith('/favicon');
 
   if (!data.user && !isPublic) {
     const url = request.nextUrl.clone();
