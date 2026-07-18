@@ -12,7 +12,10 @@ export async function supabaseServer() {
   const jar = await cookies();
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  // Share the session cookie across *.ajace.com subdomains for SSO (set in prod only).
+  const cookieDomain = process.env.NEXT_PUBLIC_COOKIE_DOMAIN;
   return createServerClient(url, key, {
+    ...(cookieDomain ? { cookieOptions: { domain: cookieDomain } } : {}),
     cookies: {
       getAll: () => jar.getAll(),
       setAll: (toSet: { name: string; value: string; options?: Record<string, unknown> }[]) => {
