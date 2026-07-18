@@ -21,14 +21,17 @@
     "@hr/workflow": "workspace:*",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.47.0",
+    "jszip": "^3.10.1",
     "lucide-react": "^1.23.0",
     "next": "^15.1.3",
     "pdf-parse": "^2.4.5",
+    "postal-mime": "^2.7.5",
     "postgres": "^3.4.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "sharp": "^0.35.3",
-    "tesseract.js": "^7.0.0"
+    "tesseract.js": "^7.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

@@ -1,6 +1,7 @@
 import { supabaseServer } from '@/lib/supabase/server';
 import { Card, StatCard, Pill, EmptyState } from '@/components/ui';
-import { Clock, Timer, Hourglass, CalendarDays, Upload, ArrowUpRight } from 'lucide-react';
+import { Clock, Timer, Hourglass, CalendarDays, ArrowUpRight } from 'lucide-react';
+import { UploadTimesheet } from '@/components/timesheets/UploadTimesheet';
 
 export const metadata = { title: 'Timesheets · Ajace' };
 export const dynamic = 'force-dynamic';
@@ -67,9 +68,10 @@ export default async function TimesheetsPage() {
           href={TIMESHEET_URL}
           target="_blank"
           rel="noreferrer"
-          style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--brand-600, #4f46e5)', fontWeight: 600, textDecoration: 'none', fontSize: 13 }}
+          style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--muted, #64748b)', fontWeight: 600, textDecoration: 'none', fontSize: 13 }}
+          title="Admin review + full features not yet ported into the platform"
         >
-          <Upload size={15} /> Upload a timesheet <ArrowUpRight size={14} />
+          Full workspace <ArrowUpRight size={14} />
         </a>
       </div>
 
@@ -81,6 +83,10 @@ export default async function TimesheetsPage() {
           <StatCard icon={<CalendarDays size={18} />} value={String(latest.days_worked ?? 0)} label="Days worked" />
         </div>
       )}
+
+      <Card title="Upload a monthly timesheet" sub="AI extracts hours, days, and totals from a PDF, image, Excel, email, or Word file.">
+        <UploadTimesheet />
+      </Card>
 
       <Card title="Your monthly timesheets">
         {sheets.length === 0 ? (
