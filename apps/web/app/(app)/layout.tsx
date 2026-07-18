@@ -25,6 +25,8 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     select full_name, email from app.users where id = ${principal.userId}`;
   const name = u?.full_name || u?.email || 'User';
   const role = primaryRole(principal);
+  // Procurement module is limited to firm leadership / a dedicated procurement role.
+  const canProcurement = principal.roleKeys.some((r) => r === 'admin' || r === 'employer' || r === 'procurement');
   const notices = await db()<{ id: string; title: string | null; body: string | null; link: string | null; type: string | null; created_at: string }[]>`
     select id, title, body, link, type, to_char(created_at,'Mon DD, HH24:MI') as created_at
     from app.notifications
@@ -48,7 +50,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="shell">
-      <Sidebar role={role} userName={name} email={u?.email ?? ''} initials={initialsOf(name)} onSignOut={doSignOut} />
+      <Sidebar role={role} userName={name} email={u?.email ?? ''} initials={initialsOf(name)} onSignOut={doSignOut} canProcurement={canProcurement} />
       <div className="main">
         <Topbar initials={initialsOf(name)} notices={notices} markAllRead={markAllRead} />
         <div className="content">{children}</div>

@@ -7,13 +7,17 @@ import {
   Scale, ScrollText, ChevronsLeft, ChevronsRight, LogOut,
   ClipboardList, CalendarDays, HeartPulse, GraduationCap, Star, BookCheck,
   LifeBuoy, FileSignature, BadgeCheck, UserMinus, ShieldCheck,
+  Clock, Briefcase,
 } from 'lucide-react';
 
 interface NavItem { href: string; label: string; icon: React.ReactNode; }
 
 export function Sidebar({
-  role, userName, email, initials, onSignOut,
-}: { role: string; userName: string; email: string; initials: string; onSignOut: () => void }) {
+  role, userName, email, initials, onSignOut, canProcurement,
+}: {
+  role: string; userName: string; email: string; initials: string;
+  onSignOut: () => void; canProcurement: boolean;
+}) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -35,6 +39,12 @@ export function Sidebar({
     { href: '/documents', label: 'Documents', icon: <FileText size={18} /> },
     { href: '/assistant', label: 'Assistant', icon: <Sparkles size={18} /> },
     { href: '/security', label: 'Security', icon: <ShieldCheck size={18} /> },
+  ];
+  // Platform modules. Timesheets is for everyone; Procurement is shown only to users
+  // whose role grants it (admin / employer / procurement) — "limited users".
+  const modules: NavItem[] = [
+    { href: '/timesheets', label: 'Timesheets', icon: <Clock size={18} /> },
+    ...(canProcurement ? [{ href: '/procurement', label: 'Procurement', icon: <Briefcase size={18} /> }] : []),
   ];
   const hr: NavItem[] = [
     { href: '/hr/onboarding', label: 'Onboarding', icon: <ClipboardList size={18} /> },
@@ -77,6 +87,13 @@ export function Sidebar({
       <nav className="nav">
         <div className="nav-section">Workspace</div>
         {main.map((it) => (
+          <Link key={it.href} href={it.href} className={`nav-item${active(it.href) ? ' active' : ''}`} title={it.label}>
+            {it.icon}
+            <span className="nav-label">{it.label}</span>
+          </Link>
+        ))}
+        <div className="nav-section">Modules</div>
+        {modules.map((it) => (
           <Link key={it.href} href={it.href} className={`nav-item${active(it.href) ? ' active' : ''}`} title={it.label}>
             {it.icon}
             <span className="nav-label">{it.label}</span>
