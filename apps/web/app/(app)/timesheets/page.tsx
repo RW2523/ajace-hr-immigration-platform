@@ -1,4 +1,6 @@
+import Link from 'next/link';
 import { supabaseServer } from '@/lib/supabase/server';
+import { getPrincipal } from '@/lib/session';
 import { Card, StatCard, Pill, EmptyState } from '@/components/ui';
 import { Clock, Timer, Hourglass, CalendarDays, ArrowUpRight } from 'lucide-react';
 import { UploadTimesheet } from '@/components/timesheets/UploadTimesheet';
@@ -36,6 +38,8 @@ function hrs(n: number | string | null): string {
  */
 export default async function TimesheetsPage() {
   const supabase = await supabaseServer();
+  const principal = await getPrincipal();
+  const isTsAdmin = !!principal && principal.roleKeys.some((r) => r === 'admin' || r === 'employer');
   const [{ data: profileRows }, { data: sheetRows }, { data: editRows }] = await Promise.all([
     supabase.from('ts_profiles').select('full_name, job_title, client').limit(1),
     supabase
@@ -64,12 +68,20 @@ export default async function TimesheetsPage() {
             </div>
           )}
         </div>
+        {isTsAdmin && (
+          <Link
+            href="/timesheets/admin"
+            style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--brand-600, #4f46e5)', fontWeight: 600, textDecoration: 'none', fontSize: 13 }}
+          >
+            Admin review
+          </Link>
+        )}
         <a
           href={TIMESHEET_URL}
           target="_blank"
           rel="noreferrer"
-          style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--muted, #64748b)', fontWeight: 600, textDecoration: 'none', fontSize: 13 }}
-          title="Admin review + full features not yet ported into the platform"
+          style={{ marginLeft: isTsAdmin ? undefined : 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--muted, #64748b)', fontWeight: 600, textDecoration: 'none', fontSize: 13 }}
+          title="Legacy full workspace"
         >
           Full workspace <ArrowUpRight size={14} />
         </a>
