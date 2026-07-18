@@ -24,7 +24,7 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false, // don't advertise Next.js
   // The service packages are TS source; let Next transpile them.
-  transpilePackages: ['@hr/shared', '@hr/db', '@hr/rules-engine', '@hr/hr', '@hr/rag', '@hr/workflow'],
+  transpilePackages: ['@hr/shared', '@hr/db', '@hr/rules-engine', '@hr/hr', '@hr/rag', '@hr/workflow', '@hr/notifications'],
   serverExternalPackages: ['pdf-parse', 'tesseract.js', 'sharp'],
   experimental: { serverActions: { bodySizeLimit: '5mb' } },
   async headers() {

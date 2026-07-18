@@ -1,0 +1,48 @@
+name: DB migrate (HR)
+
+# Applies the @hr/db SQL migrations to the shared Supabase project.
+# Uses the DIRECT (session, port 5432) connection — DDL must not run over the
+# transaction pooler. Seeding is idempotent but only runs on manual dispatch.
+#
+# Required repo secret:
+#   DATABASE_URL_DIRECT = postgres://postgres.coaszrosqlhifcwxurwu:[PW]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+#   (or the non-pooler db.<ref>.supabase.co:5432 direct string)
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: "Also run pnpm db:seed (idempotent reference data)"
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths:
+      - "packages/db/migrations/**"
+
+concurrency:
+  group: hr-db-migrate
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.10.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Apply migrations
+        run: pnpm --filter @hr/db migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_DIRECT }}
+      - name: Seed reference data
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.seed }}
+        run: pnpm --filter @hr/db seed
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_DIRECT }}
