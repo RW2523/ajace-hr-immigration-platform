@@ -1,5 +1,8 @@
 import { MfaChallenge } from '@/components/MfaChallenge';
 
+// Auth page — must not prerender (the browser Supabase client needs runtime env).
+export const dynamic = 'force-dynamic';
+
 export default function LoginMfaPage() {
   return (
     <div className="auth-wrap">

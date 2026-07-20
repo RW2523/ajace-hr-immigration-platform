@@ -19,3 +19,4 @@ scratch-seed/
 
 # Requires a token with `workflow` scope to push; add via GitHub UI or `gh auth refresh -s workflow`
 .github/workflows/ci.yml
+.vercel
