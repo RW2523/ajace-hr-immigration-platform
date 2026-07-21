@@ -90,7 +90,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
               <div><code>sheryl@ajace.com</code> · Sheryl</div>
               <div style={{ fontWeight: 700, color: 'var(--ink-2)', marginTop: 8 }}>Employee</div>
               <div><code>richard@ajace.com</code> · Richard</div>
-              <div style={{ marginTop: 10, paddingTop: 8, borderTop: '1px solid var(--border-2)' }}>Password for all: <code>Ajace@2026</code></div>
+              <div style={{ marginTop: 10, paddingTop: 8, borderTop: '1px solid var(--border-2)' }}>Ask your administrator for the password.</div>
             </div>
           </details>
           )}
