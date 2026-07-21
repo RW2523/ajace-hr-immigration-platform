@@ -1,6 +1,5 @@
 import Link from 'next/link';
-import { getPrincipal } from '@/lib/session';
-import { supabaseAdmin } from '@/lib/supabase/admin';
+import { getPrincipal, db } from '@/lib/session';
 import { Card, StatCard, Pill, EmptyState } from '@/components/ui';
 import { ClipboardCheck, AlertOctagon, CheckCircle2, Clock } from 'lucide-react';
 
@@ -53,30 +52,24 @@ export default async function TimesheetAdminPage({ searchParams }: { searchParam
       </Card>
     );
   }
-  const admin = supabaseAdmin();
-  if (!admin) {
-    return (
-      <Card>
-        <div className="muted">Set SUPABASE_SERVICE_ROLE_KEY to enable the review console.</div>
-      </Card>
-    );
-  }
-
   const { status } = await searchParams;
-  const [{ data: tsData }, { data: profData }, { data: subData }] = await Promise.all([
-    admin
-      .from('ts_timesheets')
-      .select('id,user_id,year,month,employee_name,client,monthly_total,days_worked,ai_status,ai_confidence')
-      .order('year', { ascending: false })
-      .order('month', { ascending: false })
-      .limit(500),
-    admin.from('ts_profiles').select('id,full_name,email,employer'),
-    admin.from('ts_employee_edits').select('timesheet_id,submitted').eq('submitted', true),
+  // Read the shared ts_* tables through the platform's own DB connection (postgres.js
+  // over DATABASE_URL — the same connection the rest of HR uses, which bypasses RLS),
+  // so firm leadership sees every employee's submissions. Authorization was already
+  // enforced above (admin/employer). This avoids depending on a separately-configured
+  // SUPABASE_SERVICE_ROLE_KEY that can silently return nothing if mismatched.
+  const sql = db();
+  const [tsData, profData, subData] = await Promise.all([
+    sql<TsRow[]>`
+      select id, user_id, year, month, employee_name, client, monthly_total, days_worked, ai_status, ai_confidence
+      from public.ts_timesheets order by year desc, month desc limit 500`,
+    sql<Prof[]>`select id, full_name, email, employer from public.ts_profiles`,
+    sql<{ timesheet_id: string }[]>`select timesheet_id from public.ts_employee_edits where submitted = true`,
   ]);
 
-  const rows = (tsData ?? []) as TsRow[];
-  const profiles = new Map(((profData ?? []) as Prof[]).map((p) => [p.id, p]));
-  const submitted = new Set(((subData ?? []) as { timesheet_id: string }[]).map((s) => s.timesheet_id));
+  const rows = tsData as unknown as TsRow[];
+  const profiles = new Map((profData as unknown as Prof[]).map((p) => [p.id, p]));
+  const submitted = new Set((subData as unknown as { timesheet_id: string }[]).map((s) => s.timesheet_id));
 
   const counts = { total: rows.length, needs: 0, blocked: 0, clean: 0 };
   for (const r of rows) {
