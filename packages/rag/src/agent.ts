@@ -134,6 +134,7 @@ async function defaultLLM(messages: unknown[], tools?: unknown[], toolChoice: 'a
     method: 'POST',
     headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
     body: JSON.stringify({ model, messages, tools, tool_choice: tools ? toolChoice : undefined, temperature: 0.2 }),
+    signal: AbortSignal.timeout(30_000),
   });
   if (!res.ok) throw new Error(`LLM failed: ${res.status} ${await res.text()}`);
   const json = (await res.json()) as { choices: { message: { content: string | null; tool_calls?: { id: string; function: { name: string; arguments: string } }[] } }[] };
@@ -166,6 +167,7 @@ async function* streamCompletion(messages: unknown[]): AsyncGenerator<string> {
     method: 'POST',
     headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
     body: JSON.stringify({ model, messages, temperature: 0.3, stream: true }),
+    signal: AbortSignal.timeout(45_000),
   });
   if (!res.ok || !res.body) { yield 'Sorry — I could not generate a response just now.'; return; }
   const reader = res.body.getReader();

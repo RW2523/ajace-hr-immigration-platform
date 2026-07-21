@@ -5,7 +5,7 @@ import {
   LifeBuoy, ArrowLeft, Send, UserCheck, Lock, CheckCircle2, Clock, MessageSquare,
 } from 'lucide-react';
 import { getPrincipal, db } from '@/lib/session';
-import { requirePermission, hasStaffScope, type Principal } from '@hr/shared';
+import { requirePermission, hasStaffScope, effectiveScope, type Principal } from '@hr/shared';
 import { Card, Pill } from '@/components/ui';
 
 const PRIO_TONE: Record<string, 'neutral' | 'warn' | 'danger' | 'brand'> = { low: 'neutral', normal: 'brand', high: 'warn', urgent: 'danger' };
@@ -20,8 +20,17 @@ async function loadTicket(principal: Principal, id: string) {
     from app.helpdesk_tickets t left join app.users u on u.id = t.opened_by left join app.users a on a.id = t.assignee_user_id
     where t.id = ${id}`;
   if (!t) return null;
-  const isStaff = hasStaffScope(principal, 'helpdesk', 'update');
-  const ok = t.opened_by === principal.userId || (isStaff && t.org_id === principal.orgId);
+  // Honor the caller's effective scope: an assigned-scope `hr` caseworker may only
+  // open a ticket they raised or one for an assigned employee — not any org ticket.
+  const scope = effectiveScope(principal, 'helpdesk', 'read') ?? 'own';
+  const ok =
+    t.opened_by === principal.userId ||
+    scope === 'global' ||
+    (scope === 'org' && t.org_id === principal.orgId) ||
+    (scope === 'assigned' &&
+      t.org_id === principal.orgId &&
+      t.employee_id != null &&
+      principal.assignedEmployeeIds.includes(t.employee_id));
   if (!ok) return null;
   return t;
 }

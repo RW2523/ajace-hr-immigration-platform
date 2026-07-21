@@ -4,6 +4,7 @@
  * RLS enforce — so the UI only ever receives permitted rows. RLS is the backstop.
  */
 import 'server-only';
+import { cache } from 'react';
 import { effectiveScope, type Principal } from '@hr/shared';
 import { db } from './session';
 
@@ -16,8 +17,10 @@ export interface EmployeeRow {
   user_id: string | null;
 }
 
-/** Employees visible to the principal, honoring own/assigned/org/global scope. */
-export async function scopedEmployees(principal: Principal): Promise<EmployeeRow[]> {
+/** Employees visible to the principal, honoring own/assigned/org/global scope.
+ *  cache()d so the many callers within one request (dashboard, scopedCases,
+ *  scopedUpcomingDeadlines, pendingI9…) share a single query instead of N. */
+export const scopedEmployees = cache(async (principal: Principal): Promise<EmployeeRow[]> => {
   const sql = db();
   const scope = effectiveScope(principal, 'others_profiles', 'read') ?? effectiveScope(principal, 'own_profile', 'read');
   if (scope === 'global') {
@@ -34,7 +37,7 @@ export async function scopedEmployees(principal: Principal): Promise<EmployeeRow
   }
   // own
   return sql<EmployeeRow[]>`select id, full_name, employment_type, work_authorization_category, status, user_id from app.employees where user_id = ${principal.userId}`;
-}
+});
 
 export interface CaseRow {
   id: string;

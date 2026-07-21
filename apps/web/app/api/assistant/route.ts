@@ -9,6 +9,9 @@ import { runAgentStream } from '@hr/rag';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+// Cap the function so an LLM/provider hang fails fast instead of riding to the
+// platform ceiling (which would surface as a 504).
+export const maxDuration = 60;
 
 const MAX_QUESTION_LEN = 4000;
 
@@ -32,7 +35,20 @@ export async function POST(req: Request) {
   const question = raw.trim().slice(0, MAX_QUESTION_LEN);
   if (!question) return new Response('Bad request', { status: 400 });
 
-  const { meta, stream } = await runAgentStream({ sql: db() }, principal, question);
+  // The gather step (embeddings + retrieval + first LLM call) happens here and can
+  // throw (provider 429/500/timeout). Catch it so it degrades gracefully instead of
+  // surfacing as an unhandled 500 / a hung request.
+  let meta: Awaited<ReturnType<typeof runAgentStream>>['meta'];
+  let stream: Awaited<ReturnType<typeof runAgentStream>>['stream'];
+  try {
+    ({ meta, stream } = await runAgentStream({ sql: db() }, principal, question));
+  } catch (e) {
+    console.error('[assistant] agent gather failed:', e);
+    return new Response(
+      'The assistant is temporarily unavailable (the AI provider did not respond). Please try again in a moment.',
+      { status: 503 },
+    );
+  }
   const metaB64 = Buffer.from(JSON.stringify(meta), 'utf8').toString('base64');
 
   const encoder = new TextEncoder();

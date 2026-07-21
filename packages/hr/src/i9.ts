@@ -217,8 +217,10 @@ export async function openI9Record(
   const [emp] = await sql<{ org_id: string; user_id: string | null }[]>`
     select org_id, user_id from app.employees where id = ${input.employeeId}`;
   if (!emp) throw new Error('employee not found');
+  // I-9 records are sensitive PII — authorize as sensitive_pii, not hr_items, so a
+  // read-only-PII role (hr) cannot create them.
   const grant = requirePermission(principal, {
-    resource: 'hr_items', action: 'create', requireContext: true,
+    resource: 'sensitive_pii', action: 'create', requireContext: true,
     context: { orgId: emp.org_id, employeeId: input.employeeId, ownerUserId: emp.user_id ?? undefined },
   });
 
@@ -247,7 +249,7 @@ export async function completeI9Section2(
   const ctx = await loadI9Ctx(sql, i9RecordId);
   if (!ctx) throw new Error('I-9 record not found');
   const grant = requirePermission(principal, {
-    resource: 'hr_items', action: 'update', requireContext: true,
+    resource: 'sensitive_pii', action: 'update', requireContext: true,
     context: { orgId: ctx.orgId, employeeId: ctx.employeeId, ownerUserId: ctx.ownerUserId ?? undefined },
   });
   if (docs.alternativeProcedure && !docs.employerEverifyGoodStanding) {
@@ -281,7 +283,7 @@ export async function recordEverifyCase(
   const ctx = await loadI9Ctx(sql, i9RecordId);
   if (!ctx) throw new Error('I-9 record not found');
   const grant = requirePermission(principal, {
-    resource: 'hr_items', action: 'update', requireContext: true,
+    resource: 'sensitive_pii', action: 'update', requireContext: true,
     context: { orgId: ctx.orgId, employeeId: ctx.employeeId, ownerUserId: ctx.ownerUserId ?? undefined },
   });
   await sql`

@@ -25,8 +25,8 @@
   --ink:       #0f172a;
   --ink-2:     #334155;
   --muted:     #64748b;
-  --muted-2:   #94a3b8;
-  --faint:     #cbd5e1;
+  --muted-2:   #5b6472; /* darkened from #94a3b8 to pass WCAG AA for text labels */
+  --faint:     #cbd5e1; /* decorative only (borders, chevrons, seps) — not text */
 
   /* Semantic */
   --ok:      #059669; --ok-bg:   #ecfdf5; --ok-bd:  #a7f3d0;
@@ -46,6 +46,12 @@
 }
 
 * { box-sizing: border-box; }
+/* Accessible keyboard focus ring (WCAG 2.4.7). Mouse clicks don't trigger it. */
+:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 2px; border-radius: 4px; }
+a:focus-visible, button:focus-visible, [role="button"]:focus-visible,
+input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--brand-500); outline-offset: 2px;
+}
 html, body { padding: 0; margin: 0; }
 body {
   font-family: var(--font);

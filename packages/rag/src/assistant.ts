@@ -102,6 +102,7 @@ export async function chatComplete(system: string, user: string): Promise<string
       messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
       temperature: 0.2,
     }),
+    signal: AbortSignal.timeout(30_000),
   });
   if (!res.ok) throw new Error(`LLM request failed: ${res.status} ${await res.text()}`);
   const json = (await res.json()) as { choices: { message: { content: string } }[] };

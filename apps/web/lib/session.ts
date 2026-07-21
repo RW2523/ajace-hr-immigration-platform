@@ -8,6 +8,7 @@
  * client never supplies a scope or role.
  */
 import 'server-only';
+import { cache } from 'react';
 import type postgres from 'postgres';
 import type { Permission, Principal } from '@hr/shared';
 import { createSql } from '@hr/db';
@@ -38,23 +39,30 @@ export async function signOut(): Promise<void> {
   await supabase.auth.signOut();
 }
 
-export async function getPrincipal(): Promise<Principal | null> {
+// Wrapped in React cache() so repeated getPrincipal() calls within a single request
+// (layout + page + server actions) resolve once instead of re-running the auth +
+// permission queries each time. The stable Principal it returns also lets the
+// scoped-data helpers (cache()d on `principal`) dedupe.
+export const getPrincipal = cache(async (): Promise<Principal | null> => {
   const userId = await currentUserId();
   if (!userId) return null;
   const sql = db();
   const [user] = await sql<{ org_id: string }[]>`select org_id from app.users where id = ${userId}`;
   if (!user) return null;
 
-  const permRows = await sql<{ resource: string; action: string; scope: string }[]>`
-    select distinct perm.resource, perm.action, perm.scope
-    from app.user_roles ur
-    join app.role_permissions rp on rp.role_id = ur.role_id
-    join app.permissions perm on perm.id = rp.permission_id
-    where ur.user_id = ${userId}`;
+  // The permission and role reads are independent — run them concurrently (the
+  // pooler allows >1 connection; see @hr/db createSql).
+  const [permRows, roleRows] = await Promise.all([
+    sql<{ resource: string; action: string; scope: string }[]>`
+      select distinct perm.resource, perm.action, perm.scope
+      from app.user_roles ur
+      join app.role_permissions rp on rp.role_id = ur.role_id
+      join app.permissions perm on perm.id = rp.permission_id
+      where ur.user_id = ${userId}`,
+    sql<{ key: string; scope: Record<string, unknown> }[]>`
+      select r.key, ur.scope from app.user_roles ur join app.roles r on r.id = ur.role_id where ur.user_id = ${userId}`,
+  ]);
   const permissions = permRows as unknown as Permission[];
-
-  const roleRows = await sql<{ key: string; scope: Record<string, unknown> }[]>`
-    select r.key, ur.scope from app.user_roles ur join app.roles r on r.id = ur.role_id where ur.user_id = ${userId}`;
   const assigned = new Set<string>();
   for (const r of roleRows) for (const id of ((r.scope as { assigned_employee_ids?: string[] })?.assigned_employee_ids ?? [])) assigned.add(id);
 
@@ -65,7 +73,7 @@ export async function getPrincipal(): Promise<Principal | null> {
     permissions,
     roleKeys: roleRows.map((r) => r.key),
   };
-}
+});
 
 /** Highest-privilege role key for UI routing (display only; never for authz). */
 export function primaryRole(principal: Principal): string {

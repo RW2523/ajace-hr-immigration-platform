@@ -2,9 +2,9 @@ import Link from 'next/link';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { LifeBuoy, Plus, CheckCircle2, MessageSquare, ArrowRight, AlertOctagon } from 'lucide-react';
-import { getPrincipal, primaryRole, db } from '@/lib/session';
+import { getPrincipal, db } from '@/lib/session';
 import { myEmployee } from '@/lib/data';
-import { requirePermission } from '@hr/shared';
+import { requirePermission, effectiveScope } from '@hr/shared';
 import { Card, Pill, StatCard, EmptyState } from '@/components/ui';
 
 async function openTicket(formData: FormData) {
@@ -41,9 +41,20 @@ const STATUS_TONE: Record<string, 'brand' | 'warn' | 'ok' | 'neutral'> = { open:
 
 export default async function HelpdeskPage() {
   const principal = (await getPrincipal())!;
-  const role = primaryRole(principal);
-  const isStaff = role !== 'employee';
   const sql = db();
+  // Scope tickets to the caller's effective helpdesk scope. An assigned-scope `hr`
+  // caseworker must only see tickets for their assigned employees (or ones they
+  // opened), NOT every ticket in the org.
+  const scope = effectiveScope(principal, 'helpdesk', 'read') ?? 'own';
+  const isStaff = scope !== 'own';
+  const ticketWhere =
+    scope === 'global'
+      ? sql`true`
+      : scope === 'org'
+      ? sql`t.org_id = ${principal.orgId}`
+      : scope === 'assigned'
+      ? sql`t.org_id = ${principal.orgId} and (t.opened_by = ${principal.userId} or t.employee_id = any(${principal.assignedEmployeeIds}::uuid[]))`
+      : sql`t.opened_by = ${principal.userId}`;
   const tickets = await sql<{ id: string; subject: string; status: string; priority: string; category: string; created_at: string; opener: string | null; assignee: string | null; replies: number }[]>`
     select t.id, t.subject, t.status, t.priority, t.category, to_char(t.created_at,'YYYY-MM-DD') as created_at,
       u.full_name as opener, a.full_name as assignee,
@@ -51,7 +62,7 @@ export default async function HelpdeskPage() {
     from app.helpdesk_tickets t
     left join app.users u on u.id = t.opened_by
     left join app.users a on a.id = t.assignee_user_id
-    where ${isStaff ? sql`t.org_id = ${principal.orgId}` : sql`t.opened_by = ${principal.userId}`}
+    where ${ticketWhere}
     order by case t.status when 'open' then 0 when 'pending' then 1 else 2 end,
       case t.priority when 'urgent' then 0 when 'high' then 1 when 'normal' then 2 else 3 end, t.created_at desc`;
   const open = tickets.filter((t) => t.status === 'open' || t.status === 'pending').length;

@@ -26,6 +26,7 @@ export class OpenAIEmbedder implements Embedder {
       method: 'POST',
       headers: { authorization: `Bearer ${this.apiKey}`, 'content-type': 'application/json' },
       body: JSON.stringify({ model: this.model, input: text }),
+      signal: AbortSignal.timeout(15_000),
     });
     if (!res.ok) throw new Error(`embeddings failed: ${res.status}`);
     const json = (await res.json()) as { data: { embedding: number[] }[] };
