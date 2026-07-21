@@ -10,6 +10,21 @@ const LABELS: Record<string, string> = {
   rules: 'Rules Engine', audit: 'Audit Log',
 };
 
+// Cross-app switcher (in-flow, part of the topbar). URLs come from NEXT_PUBLIC_*
+// with the deployed defaults; the current app (Immigration) is the highlighted pill.
+const PROCUREMENT_URL = process.env.NEXT_PUBLIC_PROCUREMENT_URL ?? 'https://pocu-wheat.vercel.app';
+const TIMESHEET_URL = process.env.NEXT_PUBLIC_TIMESHEET_URL ?? 'https://ajace-timesheets.vercel.app';
+
+function AppSwitch() {
+  return (
+    <nav className="appswitch" aria-label="AJACE apps">
+      <Link href="/dashboard" className="cur" aria-current="page">Immigration</Link>
+      <a href={PROCUREMENT_URL}>Procurement</a>
+      <a href={TIMESHEET_URL}>Timesheets</a>
+    </nav>
+  );
+}
+
 export function Topbar({ initials, notices, markAllRead }: { initials: string; notices: Notice[]; markAllRead: () => Promise<void> }) {
   const pathname = usePathname();
   const parts = pathname.split('/').filter(Boolean);
@@ -31,6 +46,7 @@ export function Topbar({ initials, notices, markAllRead }: { initials: string; n
         ))}
       </div>
       <div className="topbar-spacer" />
+      <AppSwitch />
       <div className="topbar-search">
         <Search size={15} />
         <input placeholder="Search cases, people, documents…" />

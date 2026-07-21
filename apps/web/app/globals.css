@@ -82,8 +82,19 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .
 .sidebar.collapsed .brand-text, .sidebar.collapsed .nav-label, .sidebar.collapsed .side-foot-text { display: none; }
 
 .nav { display: flex; flex-direction: column; gap: 2px; padding: 8px 12px; flex: 1; overflow-y: auto; }
-.nav-section { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted-2); padding: 14px 12px 6px; }
-.sidebar.collapsed .nav-section { text-align: center; overflow: hidden; }
+.nav-group { display: flex; flex-direction: column; gap: 2px; }
+/* Collapsible section header (accordion) */
+.nav-grouphead {
+  display: flex; align-items: center; justify-content: space-between; width: 100%;
+  background: transparent; border: 0; cursor: pointer; font: inherit;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted-2); padding: 14px 12px 6px; transition: color .14s;
+}
+.nav-grouphead:hover { color: var(--muted); }
+.nav-chev { color: var(--faint); transform: rotate(-90deg); transition: transform .18s ease; }
+.nav-chev.open { transform: rotate(0deg); }
+/* Icon-rail (fully collapsed) mode: no headers, thin dividers between groups */
+.sidebar.collapsed .nav-group + .nav-group { border-top: 1px solid var(--border-2); margin-top: 6px; padding-top: 6px; }
 .nav-item {
   display: flex; align-items: center; gap: 11px; padding: 9px 12px; border-radius: var(--r-sm);
   color: var(--ink-2); font-weight: 550; font-size: 13.5px; cursor: pointer; transition: all .14s; white-space: nowrap;
@@ -126,6 +137,11 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .
 }
 .topbar-search:focus-within { background: var(--surface); border-color: var(--brand-300); box-shadow: 0 0 0 3px var(--brand-50); }
 .topbar-search input { border: 0; background: transparent; outline: none; flex: 1; font: inherit; color: var(--ink); }
+/* Cross-app switcher — an in-flow segmented control in the topbar */
+.appswitch { display: flex; align-items: center; gap: 2px; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 999px; padding: 3px; }
+.appswitch a { padding: 5px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 600; color: var(--muted); white-space: nowrap; transition: all .14s; }
+.appswitch a:hover { color: var(--ink); }
+.appswitch a.cur { background: var(--surface); color: var(--brand-700); box-shadow: var(--sh-sm); cursor: default; }
 .icon-btn {
   width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface);
   color: var(--muted); display: grid; place-items: center; cursor: pointer; transition: all .14s; position: relative;
@@ -346,9 +362,16 @@ a.notif-item:hover { background: var(--bg-soft); }
 .muted { color: var(--muted); }
 .wrap-scroll { overflow-x: auto; }
 
+@media (max-width: 1100px) {
+  .appswitch { display: none; }
+}
 @media (max-width: 900px) {
-  .fgrid, .stats, .doc-grid { grid-template-columns: 1fr; }
+  .fgrid, .doc-grid { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: repeat(2, 1fr); }  /* tidy 2×2 instead of 4 stacked */
   .auth-wrap { grid-template-columns: 1fr; }
   .auth-brand { display: none; }
   .topbar-search { display: none; }
+}
+@media (max-width: 560px) {
+  .stats { grid-template-columns: 1fr; }
 }

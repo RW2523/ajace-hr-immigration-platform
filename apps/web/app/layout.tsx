@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
-import { ProductNav } from '../components/ProductNav';
 
 const sans = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -19,7 +18,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={sans.variable}>
       <body>
-        <ProductNav current="hr" />
         {children}
       </body>
     </html>
