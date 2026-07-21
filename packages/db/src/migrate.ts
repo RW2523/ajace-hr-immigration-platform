@@ -13,8 +13,29 @@ import { serviceClient } from './client.js';
 const here = dirname(fileURLToPath(import.meta.url));
 const migrationsDir = join(here, '..', 'migrations');
 
+/**
+ * Guard against a catastrophic --reset on a shared/production database. The reset
+ * drops the `auth` schema, which is shared by ALL apps on this Supabase project
+ * (HR, Timesheet, Procurement) — running it against prod would delete every app's
+ * auth users. Only allow it against an obviously-local DB, or with an explicit
+ * ALLOW_DESTRUCTIVE_RESET=1 override.
+ */
+function assertResetIsSafe(): void {
+  const url = process.env.DATABASE_URL ?? '';
+  const isLocal = /@(localhost|127\.0\.0\.1|\[::1\])[:/]/.test(url) || url === '';
+  if (isLocal || process.env.ALLOW_DESTRUCTIVE_RESET === '1') return;
+  console.error(
+    '\n✗ Refusing --reset against a non-local database.\n' +
+      '  --reset drops the shared Supabase `auth` schema, which would delete the auth\n' +
+      '  users of EVERY app on this project (HR, Timesheet, Procurement), not just HR.\n' +
+      '  If the target is genuinely a throwaway dev DB, set ALLOW_DESTRUCTIVE_RESET=1.\n',
+  );
+  process.exit(1);
+}
+
 async function main() {
   const reset = process.argv.includes('--reset');
+  if (reset) assertResetIsSafe();
   const sql = serviceClient();
   try {
     if (reset) {
